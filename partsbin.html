@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parts Bin | Field Instrument</title>
+  <style>
+    :root {
+      --bg: #f4f1e8;
+      --panel: #fffaf0;
+      --panel-2: #f9f3e5;
+      --ink: #1f241f;
+      --muted: #656257;
+      --line: #d6cbb7;
+      --accent: #315c45;
+      --accent-2: #b55a30;
+      --danger: #9c2f26;
+      --warn: #a46812;
+      --ok: #2f6c44;
+      --blue: #375a78;
+      --shadow: 0 12px 30px rgba(31, 36, 31, 0.10);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(181, 90, 48, 0.14), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(49, 92, 69, 0.12), transparent 34rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    body { padding: 22px; }
+
+    .shell {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      background: rgba(255, 250, 240, 0.82);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(31, 36, 31, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 36, 31, 0.045) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mask-image: linear-gradient(90deg, black, transparent 78%);
+      pointer-events: none;
+    }
+
+    .brand > * { position: relative; }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.72rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .eyebrow:before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 0 5px rgba(181, 90, 48, 0.12);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 5rem);
+      line-height: 0.9;
+      letter-spacing: -0.07em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      max-width: 780px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      min-width: 280px;
+    }
+
+    button, .file-label, select, input, textarea {
+      font: inherit;
+    }
+
+    button, .file-label {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      min-height: 40px;
+      cursor: pointer;
+      font-weight: 750;
+      box-shadow: 0 4px 0 rgba(31, 36, 31, 0.08);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    button:hover, .file-label:hover { transform: translateY(-1px); box-shadow: 0 6px 0 rgba(31, 36, 31, 0.08); }
+    button:active, .file-label:active { transform: translateY(1px); box-shadow: 0 2px 0 rgba(31, 36, 31, 0.08); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    button.secondary { background: var(--ink); border-color: var(--ink); color: white; }
+    button.warn { background: #fff1d6; border-color: #d6ae69; color: #6a3f00; }
+    button.danger { background: #ffe6e3; border-color: #d99b94; color: var(--danger); }
+    button.small { min-height: 32px; padding: 6px 10px; font-size: 0.84rem; box-shadow: none; }
+    button.icon { width: 34px; min-height: 34px; padding: 0; justify-content: center; box-shadow: none; }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 250, 240, 0.88);
+      color: var(--ink);
+      padding: 10px 11px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(49, 92, 69, 0.15);
+    }
+
+    textarea { min-height: 84px; resize: vertical; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 250, 240, 0.90);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-pad { padding: 16px; }
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(249, 243, 229, 0.82);
+    }
+
+    .panel-title h2, .panel-title h3 {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: -0.025em;
+      font-size: 0.98rem;
+    }
+
+    .version-pill {
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--muted);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--panel-2);
+      padding: 12px;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 1.75rem;
+      line-height: 1;
+      letter-spacing: -0.06em;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      border-radius: 999px;
+      padding: 10px 13px;
+      background: rgba(255, 250, 240, 0.7);
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1.7fr) minmax(150px, 0.75fr) minmax(150px, 0.75fr) auto;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .subtoolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: var(--panel-2);
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .chip.ok { color: var(--ok); border-color: rgba(47,108,68,.25); background: rgba(47,108,68,.08); }
+    .chip.warn { color: var(--warn); border-color: rgba(164,104,18,.28); background: rgba(164,104,18,.09); }
+    .chip.danger { color: var(--danger); border-color: rgba(156,47,38,.25); background: rgba(156,47,38,.08); }
+    .chip.blue { color: var(--blue); border-color: rgba(55,90,120,.25); background: rgba(55,90,120,.08); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(214, 203, 183, 0.75);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      background: rgba(249, 243, 229, 0.75);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover { background: rgba(49, 92, 69, 0.045); }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 720px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,250,240,0.54);
+    }
+
+    .item-name {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 220px;
+      font-weight: 850;
+    }
+
+    .thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #eadcc3, #fffaf0);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 0.76rem;
+      flex: 0 0 auto;
+      overflow: hidden;
+    }
+
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .muted { color: var(--muted); }
+    .mono { font-family: var(--mono); }
+    .right { text-align: right; }
+    .nowrap { white-space: nowrap; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 850;
+    }
+
+    .drawer-actions, .row-actions {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .row-actions { justify-content: flex-end; min-width: 160px; }
+
+    .notice {
+      border: 1px dashed rgba(49,92,69,.45);
+      background: rgba(49,92,69,.07);
+      color: #244637;
+      border-radius: 15px;
+      padding: 12px;
+      line-height: 1.45;
+      font-size: 0.9rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,250,240,.76);
+      padding: 13px;
+      display: grid;
+      gap: 10px;
+      min-height: 178px;
+    }
+
+    .card-head {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+    }
+
+    .card .thumb { width: 48px; height: 48px; border-radius: 13px; }
+    .card h3 { margin: 0; font-size: 1rem; line-height: 1.2; }
+    .card p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.4; }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(290px, 0.82fr) minmax(0, 1.18fr);
+      gap: 14px;
+    }
+
+    .bom-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) 90px 90px auto;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .readiness {
+      display: grid;
+      gap: 10px;
+    }
+
+    .meter {
+      height: 18px;
+      background: #e7dcc9;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-2), var(--accent));
+      transition: width 240ms ease;
+    }
+
+    .empty-state {
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(249, 243, 229, 0.55);
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.82rem;
+      padding: 12px;
+    }
+
+    .hidden { display: none !important; }
+    input[type="file"] { display: none; }
+
+    @media (max-width: 1080px) {
+      header, .grid, .split { grid-template-columns: 1fr; }
+      .top-actions { justify-content: flex-start; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .toolbar button { grid-column: 1 / -1; justify-content: center; }
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 12px; }
+      .brand { padding: 18px; }
+      .toolbar, .form-grid, .bom-row { grid-template-columns: 1fr; }
+      table { min-width: 930px; }
+      .stats { grid-template-columns: 1fr; }
+      .panel-title { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .top-actions, .tabs, .toolbar, .subtoolbar, .drawer-actions, .row-actions, #itemFormPanel { display: none !important; }
+      .panel, .brand { box-shadow: none; border-color: #aaa; }
+      .grid, header { grid-template-columns: 1fr; }
+      .table-wrap { max-height: none; overflow: visible; }
+      th { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <section class="brand">
+        <div class="eyebrow">Field Instrument FI-055</div>
+        <h1>Parts Bin</h1>
+        <p class="subtitle">A small inventory instrument for parts, tools, consumables, and materials. Track what is on hand, where it lives, what is low, and whether the shop can build the next kit.</p>
+      </section>
+      <nav class="top-actions" aria-label="File actions">
+        <button class="primary" id="loadSampleBtn">Load Sample Data</button>
+        <button id="exportBtn">Export JSON</button>
+        <label class="file-label" for="importFile">Import JSON</label>
+        <input id="importFile" type="file" accept="application/json,.json" />
+        <button class="warn" id="printBtn">Print</button>
+      </nav>
+    </header>
+
+    <main class="grid">
+      <aside class="panel">
+        <div class="panel-title">
+          <h2>Bench Readout</h2>
+          <span class="version-pill" id="versionPill">v0.1.0</span>
+        </div>
+        <div class="panel-pad">
+          <div class="stats" id="stats"></div>
+          <div style="height: 12px"></div>
+          <div class="notice">
+            <strong>Build Kit Mode:</strong> select a project, set the build quantity, and Parts Bin will show what is ready, what is short, and what stock remains after the build.
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="panel-title">
+          <h2>Instrument Console</h2>
+          <span class="chip blue" id="storageStatus">Local browser storage active</span>
+        </div>
+        <div class="panel-pad">
+          <div class="tabs" role="tablist" aria-label="App views">
+            <button class="tab active" data-view="inventory">Inventory</button>
+            <button class="tab" data-view="cards">Cards</button>
+            <button class="tab" data-view="lowstock">Low Stock</button>
+            <button class="tab" data-view="kit">Build Kit</button>
+            <button class="tab" data-view="count">Count Sheet</button>
+            <button class="tab" data-view="tests">Tests</button>
+          </div>
+
+          <section id="inventoryView">
+            <div class="toolbar">
+              <input id="searchInput" placeholder="Find a part, tool, material, or bin..." />
+              <select id="categoryFilter"><option value="">All categories</option></select>
+              <select id="locationFilter"><option value="">All locations</option></select>
+              <button class="secondary" id="newItemBtn">New Item</button>
+            </div>
+            <div class="subtoolbar">
+              <div class="toggle-row">
+                <button class="small" id="showLowBtn">Show low only</button>
+                <button class="small" id="clearFiltersBtn">Clear filters</button>
+              </div>
+              <span class="chip" id="resultCount">0 items</span>
+            </div>
+            <div class="split">
+              <div class="panel" id="itemFormPanel">
+                <div class="panel-title"><h3 id="formTitle">Add Item</h3></div>
+                <div class="panel-pad">
+                  <form id="itemForm" class="form-grid">
+                    <input type="hidden" id="itemId" />
+                    <label class="full">Item name<input id="itemName" required placeholder="M3 x 10mm socket head screws" /></label>
+                    <label>Category<input id="itemCategory" required placeholder="Fasteners" /></label>
+                    <label>Quantity<input id="itemQuantity" type="number" step="0.01" min="0" required /></label>
+                    <label>Unit<input id="itemUnit" required placeholder="pcs, rolls, tubes" /></label>
+                    <label>Reorder point<input id="itemReorder" type="number" step="0.01" min="0" required /></label>
+                    <label class="full">Location<input id="itemLocation" required placeholder="Electronics Bench / Drawer A3" /></label>
+                    <label class="full">Vendor<input id="itemVendor" placeholder="Digi-Key, McMaster, Local hardware" /></label>
+                    <label class="full">Image reference<input id="itemImage" placeholder="URL or local filename reference" /></label>
+                    <label class="full">Notes<textarea id="itemNotes" placeholder="Package size, substitute notes, safety notes..."></textarea></label>
+                    <div class="drawer-actions full">
+                      <button class="primary" type="submit">Save Item</button>
+                      <button type="button" id="resetFormBtn">Reset</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Item</th><th>Category</th><th class="right">Qty</th><th>Unit</th><th>Location</th><th>Status</th><th>Vendor</th><th class="right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="inventoryBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="cardsView" class="hidden">
+            <div class="cards" id="cards"></div>
+          </section>
+
+          <section id="lowstockView" class="hidden">
+            <div class="subtoolbar">
+              <span class="chip warn">Reorder and shortage board</span>
+              <button class="small" id="copyReorderBtn">Copy Reorder List</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Item</th><th>Location</th><th class="right">On Hand</th><th class="right">Reorder Point</th><th class="right">Short To Point</th><th>Vendor</th><th>Notes</th></tr></thead>
+                <tbody id="lowstockBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="kitView" class="hidden">
+            <div class="split">
+              <div class="panel">
+                <div class="panel-title"><h3>Project Setup</h3></div>
+                <div class="panel-pad">
+                  <div class="form-grid">
+                    <label class="full">Project<select id="projectSelect"></select></label>
+                    <label>Build quantity<input id="buildQty" type="number" min="1" step="1" value="1" /></label>
+                    <label>Kit status<input id="kitStatus" readonly /></label>
+                  </div>
+                  <div style="height:10px"></div>
+                  <div class="drawer-actions">
+                    <button class="primary" id="addProjectBtn">New Project</button>
+                    <button id="addBomRowBtn">Add BOM Row</button>
+                    <button class="warn" id="commitBuildBtn">Commit Build</button>
+                  </div>
+                  <div style="height:12px"></div>
+                  <div id="bomEditor"></div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-title"><h3>Build Readiness</h3></div>
+                <div class="panel-pad readiness">
+                  <div class="stat"><b id="readyKits">0</b><span>Kits ready from current stock</span></div>
+                  <div class="meter"><div id="readinessBar"></div></div>
+                  <div id="kitSummary" class="notice"></div>
+                  <div class="table-wrap">
+                    <table>
+                      <thead><tr><th>BOM Item</th><th>Inventory Match</th><th class="right">Needed</th><th class="right">Available</th><th class="right">Short</th><th>Status</th></tr></thead>
+                      <tbody id="kitBody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="countView" class="hidden">
+            <div class="subtoolbar">
+              <span class="chip blue">Printable audit sheet</span>
+              <span class="muted">Use this view during a physical count. Print or save as PDF from the browser.</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Item</th><th>Category</th><th>Location</th><th class="right">Expected</th><th>Actual Count</th><th>Discrepancy</th><th>Notes</th></tr></thead>
+                <tbody id="countBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="testsView" class="hidden">
+            <div class="subtoolbar">
+              <span class="chip blue">Built-in smoke tests</span>
+              <button class="small primary" id="runTestsBtn">Run Tests</button>
+            </div>
+            <div id="testResults" class="notice">Run the tests to verify stock status, build-kit math, storage shape, and visible version number.</div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" id="footerText">Parts Bin | M.B. Parks, Green Shoe Garage (c) 2026. All rights reserved. | Version 0.1.0</footer>
+  </div>
+
+  <script>
+    const APP_VERSION = '0.1.0';
+    const STORAGE_KEY = 'parts-bin-fi055-v1';
+
+    const sampleInventory = [
+      { id:'itm-001', name:'M3 x 10mm socket head screws', category:'Fasteners', quantity:280, unit:'pcs', location:'Fastener Cabinet / Drawer A3', reorderPoint:100, vendor:'McMaster-Carr', notes:'Common size for small assemblies.', imageRef:'' },
+      { id:'itm-002', name:'220Ω resistors', category:'Electronics', quantity:540, unit:'pcs', location:'Electronics Bench / Resistor Box', reorderPoint:120, vendor:'Digi-Key', notes:'Used in LED badge and soldering class kits.', imageRef:'' },
+      { id:'itm-003', name:'Red 5mm LEDs', category:'Electronics', quantity:68, unit:'pcs', location:'Electronics Bench / LED Bin', reorderPoint:80, vendor:'Adafruit', notes:'Check polarity labels before workshops.', imageRef:'' },
+      { id:'itm-004', name:'CR2032 coin cell batteries', category:'Power', quantity:22, unit:'pcs', location:'Consumables Shelf / Battery Box', reorderPoint:60, vendor:'Battery Junction', notes:'Workshop bottleneck item.', imageRef:'' },
+      { id:'itm-005', name:'Solder wire 0.8mm', category:'Consumables', quantity:3, unit:'rolls', location:'Solder Station / Top Shelf', reorderPoint:2, vendor:'Digi-Key', notes:'Lead-free. Keep one backup roll sealed.', imageRef:'' },
+      { id:'itm-006', name:'Flux pens', category:'Consumables', quantity:5, unit:'pens', location:'Solder Station / Drawer 1', reorderPoint:4, vendor:'Amazon Business', notes:'Cap immediately after use.', imageRef:'' },
+      { id:'itm-007', name:'Heat shrink tubing assortment', category:'Wire & Cable', quantity:9, unit:'kits', location:'Wire Cart / Bin 2', reorderPoint:3, vendor:'Harbor Freight', notes:'Mixed diameters.', imageRef:'' },
+      { id:'itm-008', name:'JST-PH 2-pin connectors', category:'Electronics', quantity:42, unit:'pcs', location:'Electronics Bench / Connector Box', reorderPoint:50, vendor:'SparkFun', notes:'Pairs with small battery packs.', imageRef:'' },
+      { id:'itm-009', name:'Nitrile gloves medium', category:'Safety', quantity:1, unit:'boxes', location:'Safety Shelf', reorderPoint:2, vendor:'Grainger', notes:'For adhesives, paint, and repair events.', imageRef:'' },
+      { id:'itm-010', name:'CA glue medium viscosity', category:'Adhesives', quantity:4, unit:'bottles', location:'Adhesives Tray', reorderPoint:3, vendor:'Local hobby shop', notes:'Store upright.', imageRef:'' },
+      { id:'itm-011', name:'PLA filament black', category:'3D Printing', quantity:2.4, unit:'kg', location:'3D Print Rack', reorderPoint:1, vendor:'Printed Solid', notes:'General purpose shop filament.', imageRef:'' },
+      { id:'itm-012', name:'Digital multimeter', category:'Tools', quantity:6, unit:'tools', location:'Tool Wall / Electrical', reorderPoint:4, vendor:'Klein Tools', notes:'Loaner tools. Count after repair events.', imageRef:'' },
+      { id:'itm-013', name:'Helping hands soldering fixture', category:'Tools', quantity:8, unit:'tools', location:'Solder Station / Fixtures Bin', reorderPoint:6, vendor:'SparkFun', notes:'Useful for student workshops.', imageRef:'' },
+      { id:'itm-014', name:'Utility knife blades', category:'Consumables', quantity:18, unit:'pcs', location:'Tool Wall / Sharp Box', reorderPoint:20, vendor:'Local hardware', notes:'Dispose used blades in sharps container.', imageRef:'' }
+    ];
+
+    const sampleProjects = [
+      { id:'prj-001', name:'LED Badge Workshop', bom:[
+        { id:'bom-001', inventoryId:'itm-002', label:'220Ω resistor', perKit:1, unit:'pcs' },
+        { id:'bom-002', inventoryId:'itm-003', label:'Red 5mm LED', perKit:2, unit:'pcs' },
+        { id:'bom-003', inventoryId:'itm-004', label:'CR2032 coin cell battery', perKit:1, unit:'pcs' },
+        { id:'bom-004', inventoryId:'itm-005', label:'Solder wire allocation', perKit:0.04, unit:'rolls' }
+      ]},
+      { id:'prj-002', name:'Basic Soldering Class', bom:[
+        { id:'bom-101', inventoryId:'itm-005', label:'Solder wire allocation', perKit:0.08, unit:'rolls' },
+        { id:'bom-102', inventoryId:'itm-006', label:'Flux pen allocation', perKit:0.08, unit:'pens' },
+        { id:'bom-103', inventoryId:'itm-013', label:'Helping hands fixture', perKit:1, unit:'tools' },
+        { id:'bom-104', inventoryId:'itm-012', label:'Digital multimeter', perKit:1, unit:'tools' }
+      ]},
+      { id:'prj-003', name:'Sensor Demo Kit', bom:[
+        { id:'bom-201', inventoryId:'itm-001', label:'M3 x 10mm screws', perKit:4, unit:'pcs' },
+        { id:'bom-202', inventoryId:'itm-008', label:'JST-PH connector', perKit:2, unit:'pcs' },
+        { id:'bom-203', inventoryId:'itm-007', label:'Heat shrink allocation', perKit:0.05, unit:'kits' }
+      ]}
+    ];
+
+    let state = loadState();
+    let filters = { search:'', category:'', location:'', lowOnly:false };
+    let currentView = 'inventory';
+
+    const els = {
+      versionPill: document.getElementById('versionPill'), footerText: document.getElementById('footerText'), storageStatus: document.getElementById('storageStatus'), stats: document.getElementById('stats'),
+      searchInput: document.getElementById('searchInput'), categoryFilter: document.getElementById('categoryFilter'), locationFilter: document.getElementById('locationFilter'), inventoryBody: document.getElementById('inventoryBody'), resultCount: document.getElementById('resultCount'),
+      form: document.getElementById('itemForm'), formTitle: document.getElementById('formTitle'), itemId: document.getElementById('itemId'), itemName: document.getElementById('itemName'), itemCategory: document.getElementById('itemCategory'), itemQuantity: document.getElementById('itemQuantity'), itemUnit: document.getElementById('itemUnit'), itemReorder: document.getElementById('itemReorder'), itemLocation: document.getElementById('itemLocation'), itemVendor: document.getElementById('itemVendor'), itemImage: document.getElementById('itemImage'), itemNotes: document.getElementById('itemNotes'),
+      cards: document.getElementById('cards'), lowstockBody: document.getElementById('lowstockBody'), countBody: document.getElementById('countBody'), projectSelect: document.getElementById('projectSelect'), buildQty: document.getElementById('buildQty'), kitStatus: document.getElementById('kitStatus'), bomEditor: document.getElementById('bomEditor'), readyKits: document.getElementById('readyKits'), readinessBar: document.getElementById('readinessBar'), kitSummary: document.getElementById('kitSummary'), kitBody: document.getElementById('kitBody'), testResults: document.getElementById('testResults')
+    };
+
+    function defaultState() {
+      return { version: APP_VERSION, inventory: structuredClone(sampleInventory), projects: structuredClone(sampleProjects), updatedAt: new Date().toISOString() };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed.inventory) || !Array.isArray(parsed.projects)) return defaultState();
+        return { ...defaultState(), ...parsed, version: APP_VERSION };
+      } catch (err) {
+        console.warn('Parts Bin load failed. Starting from sample state.', err);
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      state.version = APP_VERSION;
+      state.updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      els.storageStatus.textContent = 'Saved locally ' + new Date().toLocaleTimeString();
+    }
+
+    function uid(prefix) {
+      return prefix + '-' + Math.random().toString(36).slice(2, 8) + '-' + Date.now().toString(36).slice(-4);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function asNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function fmt(n) {
+      const value = asNumber(n);
+      return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+    }
+
+    function stockStatus(item) {
+      const qty = asNumber(item.quantity);
+      const reorder = asNumber(item.reorderPoint);
+      if (qty <= 0) return { label:'Empty', cls:'danger' };
+      if (qty < reorder) return { label:'Low', cls:'warn' };
+      return { label:'Bench Ready', cls:'ok' };
+    }
+
+    function thumbnail(item) {
+      const ref = String(item.imageRef || '').trim();
+      if (/^https?:\/\//i.test(ref) || /^data:image\//i.test(ref)) {
+        return `<span class="thumb"><img alt="" src="${escapeHtml(ref)}" onerror="this.remove();this.parentElement.textContent='${escapeHtml(item.name.slice(0,2).toUpperCase())}'"></span>`;
+      }
+      return `<span class="thumb">${escapeHtml((item.name || '?').slice(0,2).toUpperCase())}</span>`;
+    }
+
+    function filteredInventory() {
+      const needle = filters.search.trim().toLowerCase();
+      return state.inventory.filter(item => {
+        const status = stockStatus(item);
+        const hay = [item.name, item.category, item.location, item.vendor, item.notes, item.unit].join(' ').toLowerCase();
+        return (!needle || hay.includes(needle)) && (!filters.category || item.category === filters.category) && (!filters.location || item.location === filters.location) && (!filters.lowOnly || status.cls !== 'ok');
+      });
+    }
+
+    function render() {
+      els.versionPill.textContent = 'v' + APP_VERSION;
+      els.footerText.textContent = `Parts Bin | M.B. Parks, Green Shoe Garage (c) 2026. All rights reserved. | Version ${APP_VERSION}`;
+      renderStats();
+      renderFilters();
+      renderInventory();
+      renderCards();
+      renderLowStock();
+      renderCountSheet();
+      renderProjects();
+      renderKit();
+    }
+
+    function renderStats() {
+      const totalItems = state.inventory.length;
+      const low = state.inventory.filter(i => stockStatus(i).cls === 'warn').length;
+      const empty = state.inventory.filter(i => stockStatus(i).cls === 'danger').length;
+      const locations = new Set(state.inventory.map(i => i.location).filter(Boolean)).size;
+      els.stats.innerHTML = [
+        ['Item Types', totalItems], ['Low Stock', low], ['Empty', empty], ['Locations', locations]
+      ].map(([label, value]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join('');
+    }
+
+    function renderFilters() {
+      const categories = [...new Set(state.inventory.map(i => i.category).filter(Boolean))].sort();
+      const locations = [...new Set(state.inventory.map(i => i.location).filter(Boolean))].sort();
+      updateSelect(els.categoryFilter, categories, 'All categories', filters.category);
+      updateSelect(els.locationFilter, locations, 'All locations', filters.location);
+    }
+
+    function updateSelect(select, values, firstLabel, selected) {
+      const prior = select.value || selected;
+      select.innerHTML = `<option value="">${firstLabel}</option>` + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+      select.value = values.includes(prior) ? prior : '';
+    }
+
+    function renderInventory() {
+      const rows = filteredInventory();
+      els.resultCount.textContent = `${rows.length} item${rows.length === 1 ? '' : 's'}`;
+      if (!rows.length) {
+        els.inventoryBody.innerHTML = `<tr><td colspan="8"><div class="empty-state">No items match the current filters.</div></td></tr>`;
+        return;
+      }
+      els.inventoryBody.innerHTML = rows.map(item => {
+        const st = stockStatus(item);
+        return `<tr>
+          <td><div class="item-name">${thumbnail(item)}<span>${escapeHtml(item.name)}</span></div></td>
+          <td>${escapeHtml(item.category)}</td>
+          <td class="right mono">${fmt(item.quantity)}</td>
+          <td>${escapeHtml(item.unit)}</td>
+          <td>${escapeHtml(item.location)}</td>
+          <td><span class="chip ${st.cls}">${st.label}</span></td>
+          <td>${escapeHtml(item.vendor || '')}</td>
+          <td class="right"><div class="row-actions">
+            <button class="icon" title="Consume one" onclick="adjustQty('${item.id}', -1)">−</button>
+            <button class="icon" title="Add one" onclick="adjustQty('${item.id}', 1)">+</button>
+            <button class="small" onclick="editItem('${item.id}')">Edit</button>
+            <button class="small danger" onclick="deleteItem('${item.id}')">Delete</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderCards() {
+      const rows = filteredInventory();
+      els.cards.innerHTML = rows.length ? rows.map(item => {
+        const st = stockStatus(item);
+        return `<article class="card">
+          <div class="card-head">${thumbnail(item)}<div><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.category)} · ${fmt(item.quantity)} ${escapeHtml(item.unit)}</p></div></div>
+          <span class="chip ${st.cls}">${st.label}</span>
+          <p><strong>Location:</strong> ${escapeHtml(item.location)}</p>
+          <p><strong>Vendor:</strong> ${escapeHtml(item.vendor || 'Not set')}</p>
+        </article>`;
+      }).join('') : `<div class="empty-state">No cards match the current filters.</div>`;
+    }
+
+    function renderLowStock() {
+      const low = state.inventory.filter(i => stockStatus(i).cls !== 'ok').sort((a,b) => (a.quantity - a.reorderPoint) - (b.quantity - b.reorderPoint));
+      els.lowstockBody.innerHTML = low.length ? low.map(item => `<tr>
+        <td><div class="item-name">${thumbnail(item)}<span>${escapeHtml(item.name)}</span></div></td>
+        <td>${escapeHtml(item.location)}</td>
+        <td class="right mono">${fmt(item.quantity)}</td>
+        <td class="right mono">${fmt(item.reorderPoint)}</td>
+        <td class="right mono">${fmt(Math.max(0, asNumber(item.reorderPoint) - asNumber(item.quantity)))}</td>
+        <td>${escapeHtml(item.vendor || '')}</td>
+        <td>${escapeHtml(item.notes || '')}</td>
+      </tr>`).join('') : `<tr><td colspan="7"><div class="empty-state">No low stock items. The bench is ready.</div></td></tr>`;
+    }
+
+    function renderCountSheet() {
+      els.countBody.innerHTML = state.inventory.map(item => `<tr>
+        <td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.category)}</td><td>${escapeHtml(item.location)}</td><td class="right mono">${fmt(item.quantity)} ${escapeHtml(item.unit)}</td><td></td><td></td><td></td>
+      </tr>`).join('');
+    }
+
+    function renderProjects() {
+      const selected = els.projectSelect.value || state.projects[0]?.id || '';
+      els.projectSelect.innerHTML = state.projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+      if (state.projects.some(p => p.id === selected)) els.projectSelect.value = selected;
+    }
+
+    function currentProject() {
+      return state.projects.find(p => p.id === els.projectSelect.value) || state.projects[0];
+    }
+
+    function kitRows(project = currentProject(), qty = asNumber(els.buildQty.value || 1)) {
+      if (!project) return [];
+      return project.bom.map(row => {
+        const inv = state.inventory.find(i => i.id === row.inventoryId);
+        const needed = asNumber(row.perKit) * qty;
+        const available = inv ? asNumber(inv.quantity) : 0;
+        const short = Math.max(0, needed - available);
+        return { ...row, inv, needed, available, short, ok: short <= 0 };
+      });
+    }
+
+    function maxReadyKits(project = currentProject()) {
+      if (!project || !project.bom.length) return 0;
+      const capacities = project.bom.map(row => {
+        const inv = state.inventory.find(i => i.id === row.inventoryId);
+        if (!inv || asNumber(row.perKit) <= 0) return 0;
+        return Math.floor(asNumber(inv.quantity) / asNumber(row.perKit));
+      });
+      return Math.min(...capacities);
+    }
+
+    function renderKit() {
+      const project = currentProject();
+      if (!project) {
+        els.bomEditor.innerHTML = '<div class="empty-state">No projects yet.</div>';
+        return;
+      }
+      const buildQty = Math.max(1, Math.floor(asNumber(els.buildQty.value || 1)));
+      if (String(buildQty) !== els.buildQty.value) els.buildQty.value = buildQty;
+      const rows = kitRows(project, buildQty);
+      const ready = maxReadyKits(project);
+      const allOk = rows.every(r => r.ok);
+      const readiness = Math.min(100, Math.round((ready / buildQty) * 100));
+      els.readyKits.textContent = ready;
+      els.readinessBar.style.width = readiness + '%';
+      els.kitStatus.value = allOk ? 'Ready' : 'Short';
+      const shorts = rows.filter(r => !r.ok).map(r => `${r.label}: short ${fmt(r.short)} ${r.unit}`);
+      els.kitSummary.innerHTML = allOk ? `This project is <strong>bench ready</strong> for ${buildQty} kit${buildQty === 1 ? '' : 's'}.` : `Ready for <strong>${ready}</strong> complete kit${ready === 1 ? '' : 's'} at current stock. Short items: ${escapeHtml(shorts.join('; '))}.`;
+      els.kitBody.innerHTML = rows.map(r => `<tr>
+        <td>${escapeHtml(r.label)}</td>
+        <td>${escapeHtml(r.inv ? r.inv.name : 'Missing inventory match')}</td>
+        <td class="right mono">${fmt(r.needed)} ${escapeHtml(r.unit)}</td>
+        <td class="right mono">${fmt(r.available)} ${escapeHtml(r.inv ? r.inv.unit : r.unit)}</td>
+        <td class="right mono">${fmt(r.short)}</td>
+        <td><span class="chip ${r.ok ? 'ok' : 'danger'}">${r.ok ? 'Ready' : 'Short'}</span></td>
+      </tr>`).join('');
+      renderBomEditor(project);
+    }
+
+    function renderBomEditor(project) {
+      const options = state.inventory.map(i => `<option value="${i.id}">${escapeHtml(i.name)}</option>`).join('');
+      els.bomEditor.innerHTML = project.bom.map(row => `<div class="bom-row" data-bom-id="${row.id}">
+        <label>Inventory match<select data-bom-field="inventoryId">${options}</select></label>
+        <label>Per kit<input type="number" min="0" step="0.01" value="${escapeHtml(row.perKit)}" data-bom-field="perKit" /></label>
+        <label>Unit<input value="${escapeHtml(row.unit)}" data-bom-field="unit" /></label>
+        <button class="small danger" onclick="deleteBomRow('${row.id}')">Remove</button>
+        <label style="grid-column:1/-1">BOM label<input value="${escapeHtml(row.label)}" data-bom-field="label" /></label>
+      </div>`).join('');
+      project.bom.forEach(row => {
+        const select = els.bomEditor.querySelector(`[data-bom-id="${row.id}"] select[data-bom-field="inventoryId"]`);
+        if (select) select.value = row.inventoryId;
+      });
+      els.bomEditor.querySelectorAll('[data-bom-field]').forEach(input => {
+        input.addEventListener('change', event => {
+          const wrap = event.target.closest('[data-bom-id]');
+          const bomRow = project.bom.find(r => r.id === wrap.dataset.bomId);
+          if (!bomRow) return;
+          const field = event.target.dataset.bomField;
+          bomRow[field] = field === 'perKit' ? asNumber(event.target.value) : event.target.value;
+          if (field === 'inventoryId') {
+            const inv = state.inventory.find(i => i.id === event.target.value);
+            if (inv && (!bomRow.label || bomRow.label === 'New BOM Item')) {
+              bomRow.label = inv.name;
+              bomRow.unit = inv.unit;
+            }
+          }
+          saveState();
+          renderKit();
+        });
+      });
+    }
+
+    function resetForm() {
+      els.form.reset();
+      els.itemId.value = '';
+      els.itemQuantity.value = 0;
+      els.itemReorder.value = 0;
+      els.formTitle.textContent = 'Add Item';
+    }
+
+    window.editItem = function(id) {
+      const item = state.inventory.find(i => i.id === id);
+      if (!item) return;
+      els.itemId.value = item.id;
+      els.itemName.value = item.name || '';
+      els.itemCategory.value = item.category || '';
+      els.itemQuantity.value = item.quantity ?? 0;
+      els.itemUnit.value = item.unit || '';
+      els.itemReorder.value = item.reorderPoint ?? 0;
+      els.itemLocation.value = item.location || '';
+      els.itemVendor.value = item.vendor || '';
+      els.itemImage.value = item.imageRef || '';
+      els.itemNotes.value = item.notes || '';
+      els.formTitle.textContent = 'Edit Item';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.deleteItem = function(id) {
+      const item = state.inventory.find(i => i.id === id);
+      if (!item) return;
+      const used = state.projects.some(p => p.bom.some(b => b.inventoryId === id));
+      const warning = used ? '\n\nThis item is used in at least one build kit. BOM rows will become unmatched.' : '';
+      if (!confirm(`Delete ${item.name}?${warning}`)) return;
+      state.inventory = state.inventory.filter(i => i.id !== id);
+      saveState();
+      render();
+    }
+
+    window.adjustQty = function(id, delta) {
+      const item = state.inventory.find(i => i.id === id);
+      if (!item) return;
+      item.quantity = Math.max(0, asNumber(item.quantity) + delta);
+      saveState();
+      render();
+    }
+
+    window.deleteBomRow = function(bomId) {
+      const project = currentProject();
+      if (!project) return;
+      project.bom = project.bom.filter(r => r.id !== bomId);
+      saveState();
+      renderKit();
+    }
+
+    function setView(view) {
+      currentView = view;
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+      ['inventory','cards','lowstock','kit','count','tests'].forEach(name => {
+        document.getElementById(name + 'View').classList.toggle('hidden', name !== view);
+      });
+      render();
+    }
+
+    function copyReorderList() {
+      const rows = state.inventory.filter(i => stockStatus(i).cls !== 'ok');
+      const text = rows.map(i => `${i.name} | On hand: ${fmt(i.quantity)} ${i.unit} | Reorder point: ${fmt(i.reorderPoint)} | Buy at least: ${fmt(Math.max(0, asNumber(i.reorderPoint) - asNumber(i.quantity)))} | Vendor: ${i.vendor || 'Not set'}`).join('\n');
+      navigator.clipboard?.writeText(text || 'No low stock items.').then(() => alert('Reorder list copied.')).catch(() => alert(text || 'No low stock items.'));
+    }
+
+    function exportJson() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `parts-bin-v${APP_VERSION}-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJson(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(reader.result);
+          if (!Array.isArray(imported.inventory) || !Array.isArray(imported.projects)) throw new Error('Expected inventory and projects arrays.');
+          state = { ...defaultState(), ...imported, version: APP_VERSION };
+          saveState();
+          resetForm();
+          render();
+          alert('Parts Bin data imported.');
+        } catch (err) {
+          alert('Import failed: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function commitBuild() {
+      const project = currentProject();
+      const buildQty = Math.max(1, Math.floor(asNumber(els.buildQty.value || 1)));
+      const rows = kitRows(project, buildQty);
+      const shortRows = rows.filter(r => !r.ok);
+      if (shortRows.length) {
+        alert('Cannot commit build. Some BOM rows are short.');
+        return;
+      }
+      if (!confirm(`Commit ${buildQty} ${project.name} kit${buildQty === 1 ? '' : 's'} and consume inventory?`)) return;
+      rows.forEach(r => {
+        if (r.inv) r.inv.quantity = Math.max(0, asNumber(r.inv.quantity) - r.needed);
+      });
+      saveState();
+      render();
+    }
+
+    function addProject() {
+      const name = prompt('Project name:', 'New Build Kit');
+      if (!name) return;
+      const first = state.inventory[0];
+      const project = { id: uid('prj'), name, bom: first ? [{ id: uid('bom'), inventoryId: first.id, label: first.name, perKit: 1, unit: first.unit }] : [] };
+      state.projects.push(project);
+      saveState();
+      renderProjects();
+      els.projectSelect.value = project.id;
+      setView('kit');
+    }
+
+    function addBomRow() {
+      const project = currentProject();
+      const first = state.inventory[0];
+      if (!project || !first) return;
+      project.bom.push({ id: uid('bom'), inventoryId: first.id, label:'New BOM Item', perKit:1, unit:first.unit });
+      saveState();
+      renderKit();
+    }
+
+    function runTests() {
+      const results = [];
+      const assert = (name, pass, detail='') => results.push({ name, pass, detail });
+      assert('Version number is visible', document.body.innerText.includes('Version ' + APP_VERSION), 'Expected footer or pill to include current version.');
+      assert('Stock status detects empty', stockStatus({quantity:0,reorderPoint:2}).label === 'Empty');
+      assert('Stock status detects low', stockStatus({quantity:1,reorderPoint:2}).label === 'Low');
+      assert('Stock status detects ready', stockStatus({quantity:2,reorderPoint:2}).label === 'Bench Ready');
+      const testInv = [{ id:'a', quantity:10, unit:'pcs' }, { id:'b', quantity:3, unit:'pcs' }];
+      const testProject = { id:'p', name:'Test', bom:[{ inventoryId:'a', perKit:2, label:'A', unit:'pcs' }, { inventoryId:'b', perKit:1, label:'B', unit:'pcs' }] };
+      const oldInv = state.inventory;
+      state.inventory = testInv;
+      assert('Max ready kits uses limiting BOM row', maxReadyKits(testProject) === 3, 'Expected 3 ready kits.');
+      const rows = kitRows(testProject, 5);
+      assert('Build shortage calculation works', rows.find(r => r.inventoryId === 'b').short === 2, 'Expected shortage of 2.');
+      state.inventory = oldInv;
+      assert('Storage shape has inventory array', Array.isArray(state.inventory));
+      assert('Storage shape has projects array', Array.isArray(state.projects));
+      const passed = results.filter(r => r.pass).length;
+      els.testResults.innerHTML = `<strong>${passed}/${results.length} tests passed.</strong><br><br>` + results.map(r => `<div><span class="chip ${r.pass ? 'ok' : 'danger'}">${r.pass ? 'PASS' : 'FAIL'}</span> ${escapeHtml(r.name)} ${r.detail ? `<span class="muted">${escapeHtml(r.detail)}</span>` : ''}</div>`).join('');
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+    els.searchInput.addEventListener('input', e => { filters.search = e.target.value; renderInventory(); renderCards(); });
+    els.categoryFilter.addEventListener('change', e => { filters.category = e.target.value; renderInventory(); renderCards(); });
+    els.locationFilter.addEventListener('change', e => { filters.location = e.target.value; renderInventory(); renderCards(); });
+    document.getElementById('showLowBtn').addEventListener('click', () => { filters.lowOnly = !filters.lowOnly; document.getElementById('showLowBtn').textContent = filters.lowOnly ? 'Showing low only' : 'Show low only'; renderInventory(); renderCards(); });
+    document.getElementById('clearFiltersBtn').addEventListener('click', () => { filters = { search:'', category:'', location:'', lowOnly:false }; els.searchInput.value = ''; document.getElementById('showLowBtn').textContent = 'Show low only'; render(); });
+    document.getElementById('newItemBtn').addEventListener('click', resetForm);
+    document.getElementById('resetFormBtn').addEventListener('click', resetForm);
+    document.getElementById('loadSampleBtn').addEventListener('click', () => { if (confirm('Replace current Parts Bin data with sample shop data?')) { state = defaultState(); saveState(); resetForm(); render(); } });
+    document.getElementById('exportBtn').addEventListener('click', exportJson);
+    document.getElementById('importFile').addEventListener('change', e => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ''; });
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+    document.getElementById('copyReorderBtn').addEventListener('click', copyReorderList);
+    document.getElementById('projectSelect').addEventListener('change', renderKit);
+    document.getElementById('buildQty').addEventListener('input', renderKit);
+    document.getElementById('addProjectBtn').addEventListener('click', addProject);
+    document.getElementById('addBomRowBtn').addEventListener('click', addBomRow);
+    document.getElementById('commitBuildBtn').addEventListener('click', commitBuild);
+    document.getElementById('runTestsBtn').addEventListener('click', runTests);
+
+    els.form.addEventListener('submit', event => {
+      event.preventDefault();
+      const item = {
+        id: els.itemId.value || uid('itm'),
+        name: els.itemName.value.trim(),
+        category: els.itemCategory.value.trim(),
+        quantity: asNumber(els.itemQuantity.value),
+        unit: els.itemUnit.value.trim(),
+        location: els.itemLocation.value.trim(),
+        reorderPoint: asNumber(els.itemReorder.value),
+        vendor: els.itemVendor.value.trim(),
+        imageRef: els.itemImage.value.trim(),
+        notes: els.itemNotes.value.trim()
+      };
+      const idx = state.inventory.findIndex(i => i.id === item.id);
+      if (idx >= 0) state.inventory[idx] = item;
+      else state.inventory.push(item);
+      saveState();
+      resetForm();
+      render();
+    });
+
+    resetForm();
+    render();
+  </script>
+</body>
+</html>
