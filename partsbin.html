@@ -3,1197 +3,284 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Parts Bin | Field Instrument</title>
+  <title>FI-056: Parts Bin | Field Instrument</title>
   <style>
-    :root {
-      --bg: #f4f1e8;
-      --panel: #fffaf0;
-      --panel-2: #f9f3e5;
-      --ink: #1f241f;
-      --muted: #656257;
-      --line: #d6cbb7;
-      --accent: #315c45;
-      --accent-2: #b55a30;
-      --danger: #9c2f26;
-      --warn: #a46812;
-      --ok: #2f6c44;
-      --blue: #375a78;
-      --shadow: 0 12px 30px rgba(31, 36, 31, 0.10);
-      --radius: 18px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background:
-        radial-gradient(circle at top left, rgba(181, 90, 48, 0.14), transparent 34rem),
-        radial-gradient(circle at bottom right, rgba(49, 92, 69, 0.12), transparent 34rem),
-        var(--bg);
-      color: var(--ink);
-      font-family: var(--sans);
-    }
-
-    body { padding: 22px; }
-
-    .shell {
-      max-width: 1440px;
-      margin: 0 auto;
-    }
-
-    header {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 18px;
-      align-items: start;
-      margin-bottom: 18px;
-    }
-
-    .brand {
-      background: rgba(255, 250, 240, 0.82);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .brand:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(31, 36, 31, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(31, 36, 31, 0.045) 1px, transparent 1px);
-      background-size: 22px 22px;
-      mask-image: linear-gradient(90deg, black, transparent 78%);
-      pointer-events: none;
-    }
-
-    .brand > * { position: relative; }
-
-    .eyebrow {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.72rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-
-    .eyebrow:before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent-2);
-      box-shadow: 0 0 0 5px rgba(181, 90, 48, 0.12);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 5vw, 5rem);
-      line-height: 0.9;
-      letter-spacing: -0.07em;
-      text-transform: uppercase;
-    }
-
-    .subtitle {
-      max-width: 780px;
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.55;
-    }
-
-    .top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: flex-end;
-      min-width: 280px;
-    }
-
-    button, .file-label, select, input, textarea {
-      font: inherit;
-    }
-
-    button, .file-label {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 10px 14px;
-      min-height: 40px;
-      cursor: pointer;
-      font-weight: 750;
-      box-shadow: 0 4px 0 rgba(31, 36, 31, 0.08);
-      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-    }
-
-    button:hover, .file-label:hover { transform: translateY(-1px); box-shadow: 0 6px 0 rgba(31, 36, 31, 0.08); }
-    button:active, .file-label:active { transform: translateY(1px); box-shadow: 0 2px 0 rgba(31, 36, 31, 0.08); }
-    button.primary { background: var(--accent); border-color: var(--accent); color: white; }
-    button.secondary { background: var(--ink); border-color: var(--ink); color: white; }
-    button.warn { background: #fff1d6; border-color: #d6ae69; color: #6a3f00; }
-    button.danger { background: #ffe6e3; border-color: #d99b94; color: var(--danger); }
-    button.small { min-height: 32px; padding: 6px 10px; font-size: 0.84rem; box-shadow: none; }
-    button.icon { width: 34px; min-height: 34px; padding: 0; justify-content: center; box-shadow: none; }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(255, 250, 240, 0.88);
-      color: var(--ink);
-      padding: 10px 11px;
-      outline: none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(49, 92, 69, 0.15);
-    }
-
-    textarea { min-height: 84px; resize: vertical; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 320px minmax(0, 1fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .panel {
-      background: rgba(255, 250, 240, 0.90);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .panel-pad { padding: 16px; }
-    .panel-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(249, 243, 229, 0.82);
-    }
-
-    .panel-title h2, .panel-title h3 {
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: -0.025em;
-      font-size: 0.98rem;
-    }
-
-    .version-pill {
-      font-family: var(--mono);
-      font-size: 0.76rem;
-      padding: 4px 8px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--panel);
-      color: var(--muted);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .stat {
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      background: var(--panel-2);
-      padding: 12px;
-    }
-
-    .stat b {
-      display: block;
-      font-size: 1.75rem;
-      line-height: 1;
-      letter-spacing: -0.06em;
-    }
-
-    .stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.78rem;
-      margin-top: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 800;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .tab {
-      border-radius: 999px;
-      padding: 10px 13px;
-      background: rgba(255, 250, 240, 0.7);
-    }
-
-    .tab.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: minmax(240px, 1.7fr) minmax(150px, 0.75fr) minmax(150px, 0.75fr) auto;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .subtoolbar {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .toggle-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 5px 9px;
-      background: var(--panel-2);
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .chip.ok { color: var(--ok); border-color: rgba(47,108,68,.25); background: rgba(47,108,68,.08); }
-    .chip.warn { color: var(--warn); border-color: rgba(164,104,18,.28); background: rgba(164,104,18,.09); }
-    .chip.danger { color: var(--danger); border-color: rgba(156,47,38,.25); background: rgba(156,47,38,.08); }
-    .chip.blue { color: var(--blue); border-color: rgba(55,90,120,.25); background: rgba(55,90,120,.08); }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.92rem;
-    }
-
-    th, td {
-      padding: 10px 10px;
-      border-bottom: 1px solid rgba(214, 203, 183, 0.75);
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    th {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      background: rgba(249, 243, 229, 0.75);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    tbody tr:hover { background: rgba(49, 92, 69, 0.045); }
-
-    .table-wrap {
-      overflow: auto;
-      max-height: 720px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255,250,240,0.54);
-    }
-
-    .item-name {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 220px;
-      font-weight: 850;
-    }
-
-    .thumb {
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
-      border: 1px solid var(--line);
-      background: linear-gradient(135deg, #eadcc3, #fffaf0);
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      font-size: 0.76rem;
-      flex: 0 0 auto;
-      overflow: hidden;
-    }
-
-    .thumb img { width: 100%; height: 100%; object-fit: cover; }
-
-    .muted { color: var(--muted); }
-    .mono { font-family: var(--mono); }
-    .right { text-align: right; }
-    .nowrap { white-space: nowrap; }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .form-grid .full { grid-column: 1 / -1; }
-
-    label {
-      display: grid;
-      gap: 5px;
-      color: var(--muted);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 850;
-    }
-
-    .drawer-actions, .row-actions {
-      display: flex;
-      gap: 7px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .row-actions { justify-content: flex-end; min-width: 160px; }
-
-    .notice {
-      border: 1px dashed rgba(49,92,69,.45);
-      background: rgba(49,92,69,.07);
-      color: #244637;
-      border-radius: 15px;
-      padding: 12px;
-      line-height: 1.45;
-      font-size: 0.9rem;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 12px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,250,240,.76);
-      padding: 13px;
-      display: grid;
-      gap: 10px;
-      min-height: 178px;
-    }
-
-    .card-head {
-      display: flex;
-      gap: 11px;
-      align-items: flex-start;
-    }
-
-    .card .thumb { width: 48px; height: 48px; border-radius: 13px; }
-    .card h3 { margin: 0; font-size: 1rem; line-height: 1.2; }
-    .card p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.4; }
-
-    .split {
-      display: grid;
-      grid-template-columns: minmax(290px, 0.82fr) minmax(0, 1.18fr);
-      gap: 14px;
-    }
-
-    .bom-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) 90px 90px auto;
-      gap: 8px;
-      align-items: end;
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px dashed var(--line);
-    }
-
-    .readiness {
-      display: grid;
-      gap: 10px;
-    }
-
-    .meter {
-      height: 18px;
-      background: #e7dcc9;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .meter > div {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent-2), var(--accent));
-      transition: width 240ms ease;
-    }
-
-    .empty-state {
-      border: 1px dashed var(--line);
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      color: var(--muted);
-      background: rgba(249, 243, 229, 0.55);
-    }
-
-    .footer {
-      margin-top: 18px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 0.82rem;
-      padding: 12px;
-    }
-
-    .hidden { display: none !important; }
-    input[type="file"] { display: none; }
-
-    @media (max-width: 1080px) {
-      header, .grid, .split { grid-template-columns: 1fr; }
-      .top-actions { justify-content: flex-start; }
-      .toolbar { grid-template-columns: 1fr 1fr; }
-      .toolbar button { grid-column: 1 / -1; justify-content: center; }
-    }
-
-    @media (max-width: 700px) {
-      body { padding: 12px; }
-      .brand { padding: 18px; }
-      .toolbar, .form-grid, .bom-row { grid-template-columns: 1fr; }
-      table { min-width: 930px; }
-      .stats { grid-template-columns: 1fr; }
-      .panel-title { align-items: flex-start; flex-direction: column; }
-    }
-
-    @media print {
-      body { background: white; padding: 0; }
-      .top-actions, .tabs, .toolbar, .subtoolbar, .drawer-actions, .row-actions, #itemFormPanel { display: none !important; }
-      .panel, .brand { box-shadow: none; border-color: #aaa; }
-      .grid, header { grid-template-columns: 1fr; }
-      .table-wrap { max-height: none; overflow: visible; }
-      th { position: static; }
-    }
+    :root{--bg:#f4f1e8;--panel:#fffaf0;--panel2:#f8f0df;--ink:#1f241f;--muted:#656257;--line:#d6cbb7;--accent:#315c45;--accent2:#b55a30;--danger:#9c2f26;--warn:#a46812;--ok:#2f6c44;--blue:#375a78;--shadow:0 14px 34px rgba(31,36,31,.12);--radius:18px;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--control:rgba(255,250,240,.9);--grid:rgba(31,36,31,.045);--hover:rgba(49,92,69,.07);--badge:#efe3ce}
+    body[data-theme="dark"]{color-scheme:dark;--bg:#151914;--panel:#20261f;--panel2:#252c24;--ink:#f0eadc;--muted:#b8b09f;--line:#465142;--accent:#7bb48b;--accent2:#e08a58;--danger:#ff8b7e;--warn:#f3bf67;--ok:#8ed29b;--blue:#9cc4e4;--shadow:0 14px 34px rgba(0,0,0,.34);--control:rgba(32,38,31,.92);--grid:rgba(240,234,220,.045);--hover:rgba(123,180,139,.09);--badge:#2d352c}
+    *{box-sizing:border-box} html,body{min-height:100%;margin:0} body{padding:22px;background:radial-gradient(circle at top left,rgba(181,90,48,.14),transparent 34rem),radial-gradient(circle at bottom right,rgba(49,92,69,.13),transparent 34rem),var(--bg);color:var(--ink);font-family:var(--sans)}
+    .shell{max-width:1560px;margin:0 auto}.brand,.panel,.toolbar,.modal-card{background:rgba(255,250,240,.86);background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}body[data-theme="dark"] .brand,body[data-theme="dark"] .panel,body[data-theme="dark"] .toolbar,body[data-theme="dark"] .modal-card{background:var(--panel)}
+    header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;margin-bottom:16px}.brand{padding:22px;position:relative;overflow:hidden}.brand:before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;mask-image:linear-gradient(90deg,#000,transparent 78%);pointer-events:none}.brand>*{position:relative}.eyebrow{display:inline-flex;gap:8px;align-items:center;color:var(--accent);text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:900;margin-bottom:8px}.eyebrow:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 0 5px rgba(181,90,48,.12)}h1{margin:0;font-size:clamp(2.2rem,5vw,5rem);line-height:.9;letter-spacing:-.07em;text-transform:uppercase}.subtitle{max-width:850px;margin:12px 0 0;color:var(--muted);line-height:1.55}.version-pill{display:inline-flex;margin-top:12px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:var(--panel2);font-family:var(--mono);font-size:.82rem;color:var(--muted)}.top-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;min-width:300px}
+    button,.file-label,select,input,textarea{font:inherit}button,.file-label{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:10px 14px;min-height:40px;cursor:pointer;font-weight:800;box-shadow:0 4px 0 rgba(31,36,31,.08);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}button:hover,.file-label:hover{transform:translateY(-1px)}button.primary{background:var(--accent);border-color:var(--accent);color:#fff}button.secondary{background:var(--ink);border-color:var(--ink);color:var(--bg)}button.warn{background:rgba(164,104,18,.12);border-color:rgba(164,104,18,.35);color:var(--warn)}button.danger{background:rgba(156,47,38,.11);border-color:rgba(156,47,38,.35);color:var(--danger)}button.small{min-height:32px;padding:6px 10px;font-size:.84rem;box-shadow:none}button.icon{min-width:34px;min-height:34px;padding:0;justify-content:center;box-shadow:none}.file-label input{display:none}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;background:var(--control);color:var(--ink);padding:10px 11px;outline:none}textarea{min-height:82px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(49,92,69,.15)}label{display:grid;gap:6px;font-size:.82rem;color:var(--muted);font-weight:800}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grid{display:grid;gap:14px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.main{grid-template-columns:390px minmax(0,1fr);align-items:start}.toolbar{padding:12px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar .grow{flex:1 1 320px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.tab{border-radius:12px;box-shadow:none;background:var(--panel2)}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.panel{padding:16px;margin-bottom:14px}.panel-title{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.panel-title h2,.panel-title h3{margin:0}.muted{color:var(--muted)}.fine{font-size:.82rem}.mono{font-family:var(--mono)}.hidden{display:none!important}
+    .stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:14px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:13px;box-shadow:0 8px 18px rgba(31,36,31,.06)}.stat b{display:block;font-size:1.55rem}.stat span{color:var(--muted);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel2);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}tr:hover td{background:var(--hover)}tr:last-child td{border-bottom:0}.table-wrap{overflow:auto}.table-input{min-width:84px;padding:7px;border-radius:9px}.narrow{max-width:96px}.wide{min-width:180px}.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;background:var(--badge);font-size:.78rem;font-weight:900;white-space:nowrap}.ok{color:var(--ok)}.warn-text{color:var(--warn)}.danger-text{color:var(--danger)}.blue{color:var(--blue)}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}.card{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:12px;display:grid;gap:9px}.thumb{height:106px;border:1px dashed var(--line);border-radius:14px;background:linear-gradient(135deg,var(--panel2),var(--panel));display:grid;place-items:center;overflow:hidden;color:var(--muted);font-family:var(--mono);font-weight:900}.thumb img{width:100%;height:100%;object-fit:cover}.meter{height:12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}.meter>span{display:block;height:100%;background:var(--accent);width:0}.notice{border-left:5px solid var(--accent2);padding:12px;background:var(--panel2);border-radius:12px;color:var(--muted)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:20px;z-index:20}.modal-card{max-width:720px;width:min(720px,100%);padding:18px;max-height:88vh;overflow:auto}.footer{text-align:center;color:var(--muted);font-size:.82rem;margin:22px 0 6px}.print-area{background:white;color:#111;padding:18px}.label-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.label-card{break-inside:avoid;border:1px solid #222;border-radius:8px;padding:10px;background:#fff;color:#111;min-height:126px}.qr{width:54px;height:54px;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(7,1fr);gap:1px;background:#fff;border:2px solid #111;padding:2px;float:right}.qr i{display:block;background:#111}.qr i.off{background:#fff}.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:14px;box-shadow:var(--shadow);z-index:30;max-width:420px}.test-line{padding:7px 0;border-bottom:1px solid var(--line)}
+    @media(max-width:1000px){header,.grid.main{grid-template-columns:1fr}.top-actions{justify-content:flex-start}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.two,.grid.three,.grid.four{grid-template-columns:1fr}}@media print{body{background:white;color:#111;padding:0}.no-print,header,.toolbar,.tabs,.footer,.form-panel{display:none!important}.panel{box-shadow:none;border:0}.view{display:block!important}.print-only{display:block!important}button,input,select,textarea{border:1px solid #777}.table-wrap{overflow:visible}table{font-size:10pt}.label-grid{grid-template-columns:repeat(3,1fr)}}
   </style>
 </head>
 <body>
   <div class="shell">
     <header>
       <section class="brand">
-        <div class="eyebrow">Field Instrument FI-055</div>
+        <div class="eyebrow">Field Instrument FI-056</div>
         <h1>Parts Bin</h1>
-        <p class="subtitle">A small inventory instrument for parts, tools, consumables, and materials. Track what is on hand, where it lives, what is low, and whether the shop can build the next kit.</p>
+        <p class="subtitle">Small-shop inventory for parts, tools, consumables, materials, build kits, reorder lists, count sheets, checkout tracking, labels, and multi-file shop workflows.</p>
+        <span class="version-pill" id="versionPill">v1.4.0</span>
       </section>
-      <nav class="top-actions" aria-label="File actions">
-        <button class="primary" id="loadSampleBtn">Load Sample Data</button>
-        <button id="exportBtn">Export JSON</button>
-        <label class="file-label" for="importFile">Import JSON</label>
-        <input id="importFile" type="file" accept="application/json,.json" />
-        <button class="warn" id="printBtn">Print</button>
-      </nav>
+      <section class="top-actions no-print">
+        <button id="themeBtn">Dark Mode</button>
+        <button id="sampleBtn">Load Sample Data</button>
+        <button id="exportJsonBtn" class="primary">Export Shop JSON</button>
+        <label class="file-label">Import Shop JSON<input id="importJsonInput" type="file" accept="application/json,.json"></label>
+        <button id="printBtn">Print</button>
+      </section>
     </header>
 
-    <main class="grid">
-      <aside class="panel">
-        <div class="panel-title">
-          <h2>Bench Readout</h2>
-          <span class="version-pill" id="versionPill">v0.1.0</span>
-        </div>
-        <div class="panel-pad">
-          <div class="stats" id="stats"></div>
-          <div style="height: 12px"></div>
-          <div class="notice">
-            <strong>Build Kit Mode:</strong> select a project, set the build quantity, and Parts Bin will show what is ready, what is short, and what stock remains after the build.
-          </div>
-        </div>
-      </aside>
+    <nav class="tabs no-print" id="tabs"></nav>
 
-      <section class="panel">
-        <div class="panel-title">
-          <h2>Instrument Console</h2>
-          <span class="chip blue" id="storageStatus">Local browser storage active</span>
-        </div>
-        <div class="panel-pad">
-          <div class="tabs" role="tablist" aria-label="App views">
-            <button class="tab active" data-view="inventory">Inventory</button>
-            <button class="tab" data-view="cards">Cards</button>
-            <button class="tab" data-view="lowstock">Low Stock</button>
-            <button class="tab" data-view="kit">Build Kit</button>
-            <button class="tab" data-view="count">Count Sheet</button>
-            <button class="tab" data-view="tests">Tests</button>
-          </div>
+    <section class="toolbar no-print">
+      <input class="grow" id="searchInput" placeholder="Find a part, tool, material, vendor, bin, tag, or note...">
+      <select id="categoryFilter"><option value="">All categories</option></select>
+      <select id="locationFilter"><option value="">All locations</option></select>
+      <button id="lowOnlyBtn">Show Low Only</button>
+      <button id="clearFiltersBtn">Clear</button>
+    </section>
 
-          <section id="inventoryView">
-            <div class="toolbar">
-              <input id="searchInput" placeholder="Find a part, tool, material, or bin..." />
-              <select id="categoryFilter"><option value="">All categories</option></select>
-              <select id="locationFilter"><option value="">All locations</option></select>
-              <button class="secondary" id="newItemBtn">New Item</button>
-            </div>
-            <div class="subtoolbar">
-              <div class="toggle-row">
-                <button class="small" id="showLowBtn">Show low only</button>
-                <button class="small" id="clearFiltersBtn">Clear filters</button>
-              </div>
-              <span class="chip" id="resultCount">0 items</span>
-            </div>
-            <div class="split">
-              <div class="panel" id="itemFormPanel">
-                <div class="panel-title"><h3 id="formTitle">Add Item</h3></div>
-                <div class="panel-pad">
-                  <form id="itemForm" class="form-grid">
-                    <input type="hidden" id="itemId" />
-                    <label class="full">Item name<input id="itemName" required placeholder="M3 x 10mm socket head screws" /></label>
-                    <label>Category<input id="itemCategory" required placeholder="Fasteners" /></label>
-                    <label>Quantity<input id="itemQuantity" type="number" step="0.01" min="0" required /></label>
-                    <label>Unit<input id="itemUnit" required placeholder="pcs, rolls, tubes" /></label>
-                    <label>Reorder point<input id="itemReorder" type="number" step="0.01" min="0" required /></label>
-                    <label class="full">Location<input id="itemLocation" required placeholder="Electronics Bench / Drawer A3" /></label>
-                    <label class="full">Vendor<input id="itemVendor" placeholder="Digi-Key, McMaster, Local hardware" /></label>
-                    <label class="full">Image reference<input id="itemImage" placeholder="URL or local filename reference" /></label>
-                    <label class="full">Notes<textarea id="itemNotes" placeholder="Package size, substitute notes, safety notes..."></textarea></label>
-                    <div class="drawer-actions full">
-                      <button class="primary" type="submit">Save Item</button>
-                      <button type="button" id="resetFormBtn">Reset</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-              <div>
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Item</th><th>Category</th><th class="right">Qty</th><th>Unit</th><th>Location</th><th>Status</th><th>Vendor</th><th class="right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody id="inventoryBody"></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="cardsView" class="hidden">
-            <div class="cards" id="cards"></div>
-          </section>
-
-          <section id="lowstockView" class="hidden">
-            <div class="subtoolbar">
-              <span class="chip warn">Reorder and shortage board</span>
-              <button class="small" id="copyReorderBtn">Copy Reorder List</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Item</th><th>Location</th><th class="right">On Hand</th><th class="right">Reorder Point</th><th class="right">Short To Point</th><th>Vendor</th><th>Notes</th></tr></thead>
-                <tbody id="lowstockBody"></tbody>
-              </table>
-            </div>
-          </section>
-
-          <section id="kitView" class="hidden">
-            <div class="split">
-              <div class="panel">
-                <div class="panel-title"><h3>Project Setup</h3></div>
-                <div class="panel-pad">
-                  <div class="form-grid">
-                    <label class="full">Project<select id="projectSelect"></select></label>
-                    <label>Build quantity<input id="buildQty" type="number" min="1" step="1" value="1" /></label>
-                    <label>Kit status<input id="kitStatus" readonly /></label>
-                  </div>
-                  <div style="height:10px"></div>
-                  <div class="drawer-actions">
-                    <button class="primary" id="addProjectBtn">New Project</button>
-                    <button id="addBomRowBtn">Add BOM Row</button>
-                    <button class="warn" id="commitBuildBtn">Commit Build</button>
-                  </div>
-                  <div style="height:12px"></div>
-                  <div id="bomEditor"></div>
-                </div>
-              </div>
-              <div class="panel">
-                <div class="panel-title"><h3>Build Readiness</h3></div>
-                <div class="panel-pad readiness">
-                  <div class="stat"><b id="readyKits">0</b><span>Kits ready from current stock</span></div>
-                  <div class="meter"><div id="readinessBar"></div></div>
-                  <div id="kitSummary" class="notice"></div>
-                  <div class="table-wrap">
-                    <table>
-                      <thead><tr><th>BOM Item</th><th>Inventory Match</th><th class="right">Needed</th><th class="right">Available</th><th class="right">Short</th><th>Status</th></tr></thead>
-                      <tbody id="kitBody"></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="countView" class="hidden">
-            <div class="subtoolbar">
-              <span class="chip blue">Printable audit sheet</span>
-              <span class="muted">Use this view during a physical count. Print or save as PDF from the browser.</span>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Item</th><th>Category</th><th>Location</th><th class="right">Expected</th><th>Actual Count</th><th>Discrepancy</th><th>Notes</th></tr></thead>
-                <tbody id="countBody"></tbody>
-              </table>
-            </div>
-          </section>
-
-          <section id="testsView" class="hidden">
-            <div class="subtoolbar">
-              <span class="chip blue">Built-in smoke tests</span>
-              <button class="small primary" id="runTestsBtn">Run Tests</button>
-            </div>
-            <div id="testResults" class="notice">Run the tests to verify stock status, build-kit math, storage shape, and visible version number.</div>
-          </section>
-        </div>
-      </section>
+    <main>
+      <section id="dashboardView" class="view"></section>
+      <section id="inventoryView" class="view hidden"></section>
+      <section id="kitsView" class="view hidden"></section>
+      <section id="reorderView" class="view hidden"></section>
+      <section id="locationsView" class="view hidden"></section>
+      <section id="countView" class="view hidden"></section>
+      <section id="checkoutView" class="view hidden"></section>
+      <section id="historyView" class="view hidden"></section>
+      <section id="labelsView" class="view hidden"></section>
+      <section id="filesView" class="view hidden"></section>
+      <section id="testsView" class="view hidden"></section>
     </main>
 
-    <footer class="footer" id="footerText">Parts Bin | M.B. Parks, Green Shoe Garage (c) 2026. All rights reserved. | Version 0.1.0</footer>
+    <footer class="footer" id="footerText">FI-056: Parts Bin | M.B. Parks, Green Shoe Garage (c) 2026. All rights reserved. | Version 1.4.0</footer>
   </div>
+  <div id="toast" class="toast hidden"></div>
 
-  <script>
-    const APP_VERSION = '0.1.0';
-    const STORAGE_KEY = 'parts-bin-fi055-v1';
+<script>
+(() => {
+  'use strict';
+  const APP_VERSION = '1.4.0';
+  const SCHEMA_VERSION = 4;
+  const STORE_KEY = 'fi056_parts_bin_state_v1';
+  const THEME_KEY = 'fi056_parts_bin_theme';
+  const tabs = [
+    ['dashboard','Dashboard'],['inventory','Inventory'],['kits','Build Kits'],['reorder','Reorder'],['locations','Locations'],['count','Count'],['checkout','Checkout'],['history','History'],['labels','Labels'],['files','Files'],['tests','Tests']
+  ];
+  const $ = id => document.getElementById(id);
+  const views = Object.fromEntries(tabs.map(([id]) => [id, $(id + 'View')]));
+  const els = { tabs:$('tabs'), footer:$('footerText'), version:$('versionPill'), search:$('searchInput'), cat:$('categoryFilter'), loc:$('locationFilter'), low:$('lowOnlyBtn'), toast:$('toast') };
+  let filters = { search:'', category:'', location:'', lowOnly:false };
+  let activeView = 'dashboard';
+  let selectedKitId = '';
+  let selectedLabelLocation = '';
 
-    const sampleInventory = [
-      { id:'itm-001', name:'M3 x 10mm socket head screws', category:'Fasteners', quantity:280, unit:'pcs', location:'Fastener Cabinet / Drawer A3', reorderPoint:100, vendor:'McMaster-Carr', notes:'Common size for small assemblies.', imageRef:'' },
-      { id:'itm-002', name:'220Ω resistors', category:'Electronics', quantity:540, unit:'pcs', location:'Electronics Bench / Resistor Box', reorderPoint:120, vendor:'Digi-Key', notes:'Used in LED badge and soldering class kits.', imageRef:'' },
-      { id:'itm-003', name:'Red 5mm LEDs', category:'Electronics', quantity:68, unit:'pcs', location:'Electronics Bench / LED Bin', reorderPoint:80, vendor:'Adafruit', notes:'Check polarity labels before workshops.', imageRef:'' },
-      { id:'itm-004', name:'CR2032 coin cell batteries', category:'Power', quantity:22, unit:'pcs', location:'Consumables Shelf / Battery Box', reorderPoint:60, vendor:'Battery Junction', notes:'Workshop bottleneck item.', imageRef:'' },
-      { id:'itm-005', name:'Solder wire 0.8mm', category:'Consumables', quantity:3, unit:'rolls', location:'Solder Station / Top Shelf', reorderPoint:2, vendor:'Digi-Key', notes:'Lead-free. Keep one backup roll sealed.', imageRef:'' },
-      { id:'itm-006', name:'Flux pens', category:'Consumables', quantity:5, unit:'pens', location:'Solder Station / Drawer 1', reorderPoint:4, vendor:'Amazon Business', notes:'Cap immediately after use.', imageRef:'' },
-      { id:'itm-007', name:'Heat shrink tubing assortment', category:'Wire & Cable', quantity:9, unit:'kits', location:'Wire Cart / Bin 2', reorderPoint:3, vendor:'Harbor Freight', notes:'Mixed diameters.', imageRef:'' },
-      { id:'itm-008', name:'JST-PH 2-pin connectors', category:'Electronics', quantity:42, unit:'pcs', location:'Electronics Bench / Connector Box', reorderPoint:50, vendor:'SparkFun', notes:'Pairs with small battery packs.', imageRef:'' },
-      { id:'itm-009', name:'Nitrile gloves medium', category:'Safety', quantity:1, unit:'boxes', location:'Safety Shelf', reorderPoint:2, vendor:'Grainger', notes:'For adhesives, paint, and repair events.', imageRef:'' },
-      { id:'itm-010', name:'CA glue medium viscosity', category:'Adhesives', quantity:4, unit:'bottles', location:'Adhesives Tray', reorderPoint:3, vendor:'Local hobby shop', notes:'Store upright.', imageRef:'' },
-      { id:'itm-011', name:'PLA filament black', category:'3D Printing', quantity:2.4, unit:'kg', location:'3D Print Rack', reorderPoint:1, vendor:'Printed Solid', notes:'General purpose shop filament.', imageRef:'' },
-      { id:'itm-012', name:'Digital multimeter', category:'Tools', quantity:6, unit:'tools', location:'Tool Wall / Electrical', reorderPoint:4, vendor:'Klein Tools', notes:'Loaner tools. Count after repair events.', imageRef:'' },
-      { id:'itm-013', name:'Helping hands soldering fixture', category:'Tools', quantity:8, unit:'tools', location:'Solder Station / Fixtures Bin', reorderPoint:6, vendor:'SparkFun', notes:'Useful for student workshops.', imageRef:'' },
-      { id:'itm-014', name:'Utility knife blades', category:'Consumables', quantity:18, unit:'pcs', location:'Tool Wall / Sharp Box', reorderPoint:20, vendor:'Local hardware', notes:'Dispose used blades in sharps container.', imageRef:'' }
-    ];
-
-    const sampleProjects = [
-      { id:'prj-001', name:'LED Badge Workshop', bom:[
-        { id:'bom-001', inventoryId:'itm-002', label:'220Ω resistor', perKit:1, unit:'pcs' },
-        { id:'bom-002', inventoryId:'itm-003', label:'Red 5mm LED', perKit:2, unit:'pcs' },
-        { id:'bom-003', inventoryId:'itm-004', label:'CR2032 coin cell battery', perKit:1, unit:'pcs' },
-        { id:'bom-004', inventoryId:'itm-005', label:'Solder wire allocation', perKit:0.04, unit:'rolls' }
-      ]},
-      { id:'prj-002', name:'Basic Soldering Class', bom:[
-        { id:'bom-101', inventoryId:'itm-005', label:'Solder wire allocation', perKit:0.08, unit:'rolls' },
-        { id:'bom-102', inventoryId:'itm-006', label:'Flux pen allocation', perKit:0.08, unit:'pens' },
-        { id:'bom-103', inventoryId:'itm-013', label:'Helping hands fixture', perKit:1, unit:'tools' },
-        { id:'bom-104', inventoryId:'itm-012', label:'Digital multimeter', perKit:1, unit:'tools' }
-      ]},
-      { id:'prj-003', name:'Sensor Demo Kit', bom:[
-        { id:'bom-201', inventoryId:'itm-001', label:'M3 x 10mm screws', perKit:4, unit:'pcs' },
-        { id:'bom-202', inventoryId:'itm-008', label:'JST-PH connector', perKit:2, unit:'pcs' },
-        { id:'bom-203', inventoryId:'itm-007', label:'Heat shrink allocation', perKit:0.05, unit:'kits' }
-      ]}
-    ];
-
-    let state = loadState();
-    let filters = { search:'', category:'', location:'', lowOnly:false };
-    let currentView = 'inventory';
-
-    const els = {
-      versionPill: document.getElementById('versionPill'), footerText: document.getElementById('footerText'), storageStatus: document.getElementById('storageStatus'), stats: document.getElementById('stats'),
-      searchInput: document.getElementById('searchInput'), categoryFilter: document.getElementById('categoryFilter'), locationFilter: document.getElementById('locationFilter'), inventoryBody: document.getElementById('inventoryBody'), resultCount: document.getElementById('resultCount'),
-      form: document.getElementById('itemForm'), formTitle: document.getElementById('formTitle'), itemId: document.getElementById('itemId'), itemName: document.getElementById('itemName'), itemCategory: document.getElementById('itemCategory'), itemQuantity: document.getElementById('itemQuantity'), itemUnit: document.getElementById('itemUnit'), itemReorder: document.getElementById('itemReorder'), itemLocation: document.getElementById('itemLocation'), itemVendor: document.getElementById('itemVendor'), itemImage: document.getElementById('itemImage'), itemNotes: document.getElementById('itemNotes'),
-      cards: document.getElementById('cards'), lowstockBody: document.getElementById('lowstockBody'), countBody: document.getElementById('countBody'), projectSelect: document.getElementById('projectSelect'), buildQty: document.getElementById('buildQty'), kitStatus: document.getElementById('kitStatus'), bomEditor: document.getElementById('bomEditor'), readyKits: document.getElementById('readyKits'), readinessBar: document.getElementById('readinessBar'), kitSummary: document.getElementById('kitSummary'), kitBody: document.getElementById('kitBody'), testResults: document.getElementById('testResults')
+  const sampleInventory = [
+    {name:'M3 x 10mm Socket Head Screws',category:'Fasteners',quantity:380,unit:'pcs',location:'Garage / Fastener Cabinet / Drawer A3',reorderPoint:100,targetQty:500,vendor:'McMaster-Carr',vendorUrl:'https://www.mcmaster.com',partNumber:'91292A112',manufacturer:'Generic',unitCost:0.04,notes:'Common machine screw for small assemblies.',tags:'m3, screws, metric',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'M3 x 12mm Pan Head Screws',category:'Fasteners',quantity:140,unit:'pcs',location:'Garage / Fastener Cabinet / Drawer A3',reorderPoint:100,targetQty:400,vendor:'McMaster-Carr',vendorUrl:'',partNumber:'92005A122',manufacturer:'Generic',unitCost:0.05,notes:'Acceptable substitute for many M3 fastener calls.',tags:'m3, substitute',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'220Ω Resistors',category:'Electronics',quantity:820,unit:'pcs',location:'Garage / Electronics Bench / Drawer E1',reorderPoint:200,targetQty:1000,vendor:'Digi-Key',vendorUrl:'https://www.digikey.com',partNumber:'CF14JT220RCT-ND',manufacturer:'Yageo',unitCost:0.01,notes:'LED current limiting.',tags:'resistor, led, 220',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'Red 5mm LEDs',category:'Electronics',quantity:92,unit:'pcs',location:'Garage / Electronics Bench / Drawer E2',reorderPoint:100,targetQty:500,vendor:'Adafruit',vendorUrl:'',partNumber:'LED-RED-5MM',manufacturer:'Generic',unitCost:0.07,notes:'Low for classes.',tags:'led, red, 5mm',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'CR2032 Batteries',category:'Power',quantity:16,unit:'pcs',location:'Garage / Battery Box / Coin Cells',reorderPoint:30,targetQty:120,vendor:'Amazon',vendorUrl:'',partNumber:'CR2032',manufacturer:'Panasonic',unitCost:0.38,notes:'Used in badge workshops.',tags:'battery, coin cell',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'Solder Wire 0.8mm',category:'Consumables',quantity:2,unit:'spools',location:'Garage / Solder Station / Top Shelf',reorderPoint:2,targetQty:6,vendor:'Kester',vendorUrl:'',partNumber:'24-6337-8800',manufacturer:'Kester',unitCost:29.50,notes:'Lead-free shop solder.',tags:'solder',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'Flux Pens',category:'Consumables',quantity:5,unit:'pcs',location:'Garage / Solder Station / Drawer S1',reorderPoint:4,targetQty:12,vendor:'Digi-Key',vendorUrl:'',partNumber:'CW8100',manufacturer:'Chemtronics',unitCost:7.25,notes:'Repair clinic consumable.',tags:'flux, solder',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'Heat Shrink Tubing Assortment',category:'Wire & Cable',quantity:7,unit:'kits',location:'Garage / Wire Rack / Bin W2',reorderPoint:3,targetQty:10,vendor:'Amazon',vendorUrl:'',partNumber:'HS-ASST',manufacturer:'Generic',unitCost:8.00,notes:'Assorted diameters.',tags:'heat shrink, wire',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'PLA Filament - Black',category:'3D Printing',quantity:3,unit:'spools',location:'Garage / 3D Print Shelf / PLA',reorderPoint:2,targetQty:6,vendor:'Printed Solid',vendorUrl:'',partNumber:'PLA-BLK-1KG',manufacturer:'Jessie',unitCost:22.00,notes:'Default prototyping filament.',tags:'pla, filament',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'Digital Multimeter',category:'Tools',quantity:6,unit:'tools',location:'Garage / Tool Wall / Electrical',reorderPoint:4,targetQty:8,vendor:'Klein Tools',vendorUrl:'',partNumber:'MM400',manufacturer:'Klein',unitCost:49.00,notes:'Loaner tools for workshops.',tags:'meter, electrical',imageRef:'',consumable:false,reusable:true,checkoutStatus:'available'},
+    {name:'Helping Hands Solder Fixture',category:'Tools',quantity:8,unit:'tools',location:'Garage / Solder Station / Fixture Bin',reorderPoint:6,targetQty:10,vendor:'Adafruit',vendorUrl:'',partNumber:'291',manufacturer:'Generic',unitCost:6.95,notes:'Use one per student station.',tags:'solder, fixture',imageRef:'',consumable:false,reusable:true,checkoutStatus:'available'},
+    {name:'Nitrile Gloves',category:'Safety',quantity:1,unit:'boxes',location:'Garage / Safety Cabinet / PPE',reorderPoint:2,targetQty:6,vendor:'Uline',vendorUrl:'',partNumber:'S-12345',manufacturer:'Generic',unitCost:12.00,notes:'Medium gloves.',tags:'ppe, gloves',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'CA Glue Thin',category:'Adhesives',quantity:3,unit:'bottles',location:'Garage / Adhesives Shelf / CA',reorderPoint:2,targetQty:6,vendor:'Bob Smith',vendorUrl:'',partNumber:'BSI-101',manufacturer:'Bob Smith Industries',unitCost:5.50,notes:'Keep capped.',tags:'glue',imageRef:'',consumable:true,reusable:false,checkoutStatus:'available'},
+    {name:'Raspberry Pi 5 8GB',category:'Computing',quantity:4,unit:'boards',location:'Garage / Computing Bin / SBC',reorderPoint:2,targetQty:6,vendor:'CanaKit',vendorUrl:'',partNumber:'RPI5-8GB',manufacturer:'Raspberry Pi',unitCost:80.00,notes:'Bench setup boards.',tags:'raspberry pi, sbc',imageRef:'',consumable:false,reusable:true,checkoutStatus:'available'}
+  ];
+  const makeIds = (items) => items.map((item, idx) => ({ id:'itm_' + String(idx+1).padStart(3,'0'), lastUpdated:now(), lastCounted:'', reorderStatus:'not needed', checkedOutTo:'', dueDate:'', condition:'good', ...item }));
+  function sampleState(){
+    const inventory = makeIds(sampleInventory);
+    const byName = n => inventory.find(i => i.name === n)?.id || '';
+    return {
+      appVersion: APP_VERSION, schemaVersion: SCHEMA_VERSION, updatedAt: now(),
+      inventory,
+      locations: unique(inventory.map(i => i.location)).map((name,idx)=>({id:'loc_'+idx,name,zone:name.split('/').map(s=>s.trim())[1]||'',notes:'',lastAudited:''})),
+      kits:[
+        {id:'kit_001',name:'LED Badge Workshop',description:'Coin-cell LED badge kit for students.',defaultQty:20,notes:'Good first soldering project.',bom:[
+          {id:'bom_1',label:'Red 5mm LEDs',inventoryId:byName('Red 5mm LEDs'),perKit:2,unit:'pcs',substituteIds:''},
+          {id:'bom_2',label:'220Ω Resistors',inventoryId:byName('220Ω Resistors'),perKit:2,unit:'pcs',substituteIds:''},
+          {id:'bom_3',label:'CR2032 Batteries',inventoryId:byName('CR2032 Batteries'),perKit:1,unit:'pcs',substituteIds:''},
+          {id:'bom_4',label:'Solder Wire',inventoryId:byName('Solder Wire 0.8mm'),perKit:.03,unit:'spools',substituteIds:''}
+        ]},
+        {id:'kit_002',name:'Basic Soldering Class',description:'Station setup and consumables for a soldering class.',defaultQty:8,notes:'Requires reusable stations plus consumables.',bom:[
+          {id:'bom_5',label:'Helping Hands',inventoryId:byName('Helping Hands Solder Fixture'),perKit:1,unit:'tools',substituteIds:''},
+          {id:'bom_6',label:'Flux Pen',inventoryId:byName('Flux Pens'),perKit:.25,unit:'pcs',substituteIds:''},
+          {id:'bom_7',label:'Solder Wire',inventoryId:byName('Solder Wire 0.8mm'),perKit:.05,unit:'spools',substituteIds:''},
+          {id:'bom_8',label:'Nitrile Gloves',inventoryId:byName('Nitrile Gloves'),perKit:.08,unit:'boxes',substituteIds:''}
+        ]},
+        {id:'kit_003',name:'Raspberry Pi Bench Setup',description:'Reusable setup for compute bench work.',defaultQty:4,notes:'Use checkout for boards and meters.',bom:[
+          {id:'bom_9',label:'Raspberry Pi 5',inventoryId:byName('Raspberry Pi 5 8GB'),perKit:1,unit:'boards',substituteIds:''},
+          {id:'bom_10',label:'Digital Multimeter',inventoryId:byName('Digital Multimeter'),perKit:1,unit:'tools',substituteIds:''}
+        ]}
+      ],
+      countSessions:[], checkouts:[], history:[], adjustments:[]
     };
+  }
 
-    function defaultState() {
-      return { version: APP_VERSION, inventory: structuredClone(sampleInventory), projects: structuredClone(sampleProjects), updatedAt: new Date().toISOString() };
-    }
+  let state = loadState();
 
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return defaultState();
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed.inventory) || !Array.isArray(parsed.projects)) return defaultState();
-        return { ...defaultState(), ...parsed, version: APP_VERSION };
-      } catch (err) {
-        console.warn('Parts Bin load failed. Starting from sample state.', err);
-        return defaultState();
-      }
-    }
+  function uid(prefix){ return prefix + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7); }
+  function now(){ return new Date().toISOString(); }
+  function today(){ return new Date().toISOString().slice(0,10); }
+  function esc(v){ return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+  function money(v){ return '$' + num(v).toFixed(2); }
+  function fmt(v){ const n=num(v); return Number.isInteger(n) ? String(n) : String(Math.round(n*100)/100); }
+  function unique(arr){ return [...new Set(arr.filter(Boolean).map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b)); }
+  function item(id){ return state.inventory.find(i => i.id === id); }
+  function kit(id){ return state.kits.find(k => k.id === id); }
+  function save(){ state.appVersion = APP_VERSION; state.schemaVersion = SCHEMA_VERSION; state.updatedAt = now(); localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  function loadState(){
+    try { const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); return migrate(parsed || sampleState()); }
+    catch(e){ return sampleState(); }
+  }
+  function migrate(data){
+    const base = sampleState();
+    const s = { ...base, ...data };
+    s.inventory = Array.isArray(s.inventory) ? s.inventory : [];
+    s.kits = Array.isArray(s.kits || s.projects) ? (s.kits || s.projects) : [];
+    s.locations = Array.isArray(s.locations) ? s.locations : [];
+    s.countSessions = Array.isArray(s.countSessions) ? s.countSessions : [];
+    s.checkouts = Array.isArray(s.checkouts) ? s.checkouts : [];
+    s.history = Array.isArray(s.history) ? s.history : [];
+    s.adjustments = Array.isArray(s.adjustments) ? s.adjustments : [];
+    s.inventory = s.inventory.map((i,idx)=>({id:i.id||uid('itm'),name:'',category:'',quantity:0,unit:'pcs',location:'',reorderPoint:0,targetQty:0,vendor:'',vendorUrl:'',partNumber:'',manufacturer:'',unitCost:0,notes:'',tags:'',imageRef:'',consumable:true,reusable:false,reorderStatus:'not needed',lastUpdated:now(),lastCounted:'',checkoutStatus:'available',checkedOutTo:'',dueDate:'',condition:'good',...i}));
+    s.kits = s.kits.map(k=>({id:k.id||uid('kit'),name:k.name||'Untitled Kit',description:k.description||'',defaultQty:num(k.defaultQty||1),notes:k.notes||'',bom:Array.isArray(k.bom)?k.bom:[]}));
+    if(!s.locations.length){ s.locations = unique(s.inventory.map(i=>i.location)).map((name,idx)=>({id:'loc_'+idx,name,zone:name.split('/').map(x=>x.trim())[1]||'',notes:'',lastAudited:''})); }
+    s.appVersion = APP_VERSION; s.schemaVersion = SCHEMA_VERSION;
+    return s;
+  }
+  function toast(msg){ els.toast.textContent = msg; els.toast.classList.remove('hidden'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>els.toast.classList.add('hidden'),2600); }
 
-    function saveState() {
-      state.version = APP_VERSION;
-      state.updatedAt = new Date().toISOString();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      els.storageStatus.textContent = 'Saved locally ' + new Date().toLocaleTimeString();
-    }
+  function status(i){ if(num(i.quantity)<=0) return ['Empty','danger-text']; if(num(i.quantity)<=num(i.reorderPoint)) return ['Low','warn-text']; if(i.checkoutStatus==='checked out') return ['Checked Out','blue']; return ['Bench Ready','ok']; }
+  function isLow(i){ return num(i.quantity)<=num(i.reorderPoint); }
+  function filteredInventory(){
+    const q = filters.search.trim().toLowerCase();
+    return state.inventory.filter(i => {
+      const hay = [i.name,i.category,i.location,i.vendor,i.partNumber,i.manufacturer,i.notes,i.tags,i.unit].join(' ').toLowerCase();
+      return (!q || hay.includes(q)) && (!filters.category || i.category===filters.category) && (!filters.location || i.location===filters.location) && (!filters.lowOnly || isLow(i));
+    }).sort((a,b)=>a.name.localeCompare(b.name));
+  }
+  function render(){
+    els.version.textContent = 'v' + APP_VERSION;
+    els.footer.textContent = `FI-056: Parts Bin | M.B. Parks, Green Shoe Garage (c) 2026. All rights reserved. | Version ${APP_VERSION}`;
+    renderTabs(); renderFilters(); Object.values(views).forEach(v=>v.classList.add('hidden')); views[activeView].classList.remove('hidden');
+    ({dashboard:renderDashboard,inventory:renderInventory,kits:renderKits,reorder:renderReorder,locations:renderLocations,count:renderCount,checkout:renderCheckout,history:renderHistory,labels:renderLabels,files:renderFiles,tests:renderTests}[activeView])();
+  }
+  function renderTabs(){ els.tabs.innerHTML = tabs.map(([id,label])=>`<button class="tab ${activeView===id?'active':''}" data-tab="${id}">${label}</button>`).join(''); els.tabs.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{activeView=b.dataset.tab;render();}); }
+  function renderFilters(){ fillSelect(els.cat, unique(state.inventory.map(i=>i.category)), 'All categories', filters.category); fillSelect(els.loc, unique(state.inventory.map(i=>i.location)), 'All locations', filters.location); els.low.textContent = filters.lowOnly ? 'Showing Low Only' : 'Show Low Only'; }
+  function fillSelect(sel, values, label, current){ sel.innerHTML = `<option value="">${esc(label)}</option>` + values.map(v=>`<option ${v===current?'selected':''}>${esc(v)}</option>`).join(''); }
+  function statCards(){
+    const inv=state.inventory, low=inv.filter(isLow).length, empty=inv.filter(i=>num(i.quantity)<=0).length, tools=inv.filter(i=>i.reusable).length, due=state.checkouts.filter(c=>c.status==='out' && c.dueDate && c.dueDate<today()).length;
+    return `<section class="stats"><div class="stat"><b>${inv.length}</b><span>Item Types</span></div><div class="stat"><b>${low}</b><span>Low Stock</span></div><div class="stat"><b>${empty}</b><span>Empty</span></div><div class="stat"><b>${state.kits.length}</b><span>Build Kits</span></div><div class="stat"><b>${tools}</b><span>Reusable Tools</span></div><div class="stat"><b>${due}</b><span>Overdue</span></div></section>`;
+  }
+  function renderDashboard(){
+    const low = state.inventory.filter(isLow).slice(0,8);
+    const blocked = state.kits.map(k=>({k, max:maxKits(k)})).sort((a,b)=>a.max-b.max).slice(0,6);
+    views.dashboard.innerHTML = `${statCards()}<div class="grid two"><section class="panel"><div class="panel-title"><h2>Bench Readiness</h2><button class="small" onclick="App.setView('kits')">Open Kits</button></div>${blocked.map(x=>`<div class="notice"><b>${esc(x.k.name)}</b><br><span class="muted">Maximum ready kits: ${fmt(x.max)}</span></div>`).join('')}</section><section class="panel"><div class="panel-title"><h2>Low / Reorder</h2><button class="small" onclick="App.setView('reorder')">Open Reorder</button></div>${low.length?low.map(i=>`<p><span class="chip ${status(i)[1]}">${status(i)[0]}</span> <b>${esc(i.name)}</b> — ${fmt(i.quantity)} ${esc(i.unit)} at ${esc(i.location)}</p>`).join(''):'<p class="muted">No low stock items.</p>'}</section></div><section class="panel"><h2>Field Notes</h2><p class="muted">FI-056 Parts Bin is now developed through v1.4.0: inventory usability, build kits, data safety, reorder workflow, locations, count audits, image references, regression tests, checkout tracking, build history, labels, and multi-file workflows.</p></section>`;
+  }
 
-    function uid(prefix) {
-      return prefix + '-' + Math.random().toString(36).slice(2, 8) + '-' + Date.now().toString(36).slice(-4);
-    }
+  function renderInventory(){
+    views.inventory.innerHTML = `<div class="grid main"><section class="panel form-panel no-print"><div class="panel-title"><h2 id="formTitle">Add / Edit Item</h2><button class="small" onclick="App.resetItemForm()">New Item</button></div><form id="itemForm" class="grid two">${itemFormFields()}<div class="row"><button class="primary" type="submit">Save Item</button><button type="button" onclick="App.resetItemForm()">Reset</button></div></form></section><section><div class="panel"><div class="panel-title"><h2>Inventory</h2><div class="row"><button class="small" onclick="App.exportCsv('inventory')">Export CSV</button><button class="small" onclick="App.setView('labels')">Labels</button></div></div><div class="table-wrap">${inventoryTable(filteredInventory())}</div></section><section class="panel"><div class="panel-title"><h2>Card View</h2><span class="muted fine">Visual reference cards</span></div><div class="cards">${filteredInventory().map(card).join('')}</div></section></section></div>`;
+    $('itemForm').onsubmit = saveItemFromForm;
+    resetItemForm(false);
+  }
+  function itemFormFields(i={}){ const vals={id:'',name:'',category:'',quantity:0,unit:'pcs',location:'',reorderPoint:0,targetQty:0,vendor:'',vendorUrl:'',partNumber:'',manufacturer:'',unitCost:0,tags:'',imageRef:'',notes:'',consumable:true,reusable:false,...i};
+    return `<input type="hidden" id="f_id" value="${esc(vals.id)}"><label>Item Name<input id="f_name" required value="${esc(vals.name)}"></label><label>Category<input id="f_category" value="${esc(vals.category)}"></label><label>Quantity<input id="f_quantity" type="number" step="any" value="${esc(vals.quantity)}"></label><label>Unit<input id="f_unit" value="${esc(vals.unit)}"></label><label>Location<input id="f_location" value="${esc(vals.location)}"></label><label>Reorder Point<input id="f_reorderPoint" type="number" step="any" value="${esc(vals.reorderPoint)}"></label><label>Target Qty<input id="f_targetQty" type="number" step="any" value="${esc(vals.targetQty)}"></label><label>Vendor<input id="f_vendor" value="${esc(vals.vendor)}"></label><label>Vendor URL<input id="f_vendorUrl" value="${esc(vals.vendorUrl)}"></label><label>Part Number<input id="f_partNumber" value="${esc(vals.partNumber)}"></label><label>Manufacturer<input id="f_manufacturer" value="${esc(vals.manufacturer)}"></label><label>Unit Cost<input id="f_unitCost" type="number" step="0.01" value="${esc(vals.unitCost)}"></label><label>Tags<input id="f_tags" value="${esc(vals.tags)}"></label><label>Image Reference<input id="f_imageRef" value="${esc(vals.imageRef)}"></label><label>Consumable?<select id="f_consumable"><option value="true" ${vals.consumable?'selected':''}>Yes</option><option value="false" ${!vals.consumable?'selected':''}>No</option></select></label><label>Reusable / Checkout?<select id="f_reusable"><option value="false" ${!vals.reusable?'selected':''}>No</option><option value="true" ${vals.reusable?'selected':''}>Yes</option></select></label><label style="grid-column:1/-1">Notes<textarea id="f_notes">${esc(vals.notes)}</textarea></label>`; }
+  function inventoryTable(rows){ if(!rows.length) return '<p class="muted">No inventory matches the current filters.</p>'; return `<table><thead><tr><th>Item</th><th>Qty</th><th>Location</th><th>Reorder</th><th>Vendor</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows.map(i=>{const st=status(i);return `<tr><td><b>${esc(i.name)}</b><br><span class="muted fine">${esc(i.category)} · ${esc(i.partNumber||'No part #')} · ${esc(i.tags||'')}</span></td><td><input class="table-input narrow" type="number" step="any" value="${esc(i.quantity)}" onchange="App.inline('${i.id}','quantity',this.value)"> ${esc(i.unit)}</td><td><input class="table-input wide" value="${esc(i.location)}" onchange="App.inline('${i.id}','location',this.value)"></td><td><input class="table-input narrow" type="number" step="any" value="${esc(i.reorderPoint)}" onchange="App.inline('${i.id}','reorderPoint',this.value)"><br><span class="muted fine">Target ${fmt(i.targetQty)}</span></td><td>${i.vendorUrl?`<a href="${esc(i.vendorUrl)}" target="_blank" rel="noopener">${esc(i.vendor||'Vendor')}</a>`:esc(i.vendor||'')}<br><span class="muted fine">${esc(i.manufacturer||'')}</span></td><td><span class="chip ${st[1]}">${st[0]}</span><br><span class="muted fine">Updated ${esc((i.lastUpdated||'').slice(0,10))}</span></td><td><div class="row"><button class="icon" title="Consume" onclick="App.adjust('${i.id}',-1,'consumed')">−</button><button class="icon" title="Add" onclick="App.adjust('${i.id}',1,'received')">+</button><button class="small" onclick="App.editItem('${i.id}')">Edit</button><button class="small" onclick="App.duplicateItem('${i.id}')">Duplicate</button><button class="small danger" onclick="App.deleteItem('${i.id}')">Delete</button></div></td></tr>`}).join('')}</tbody></table>`; }
+  function card(i){ const st=status(i); return `<article class="card"><div class="thumb">${i.imageRef?`<img src="${esc(i.imageRef)}" alt="${esc(i.name)}" onerror="this.replaceWith(document.createTextNode('NO IMAGE'))">`:'PART'}</div><b>${esc(i.name)}</b><span class="chip ${st[1]}">${st[0]}</span><span>${fmt(i.quantity)} ${esc(i.unit)}</span><span class="muted fine">${esc(i.location)}</span><button class="small" onclick="App.editItem('${i.id}')">Open Item</button></article>`; }
+  function saveItemFromForm(e){ e.preventDefault(); const id=$('f_id').value||uid('itm'); const existing=item(id)||{}; const out={...existing,id,name:$('f_name').value.trim(),category:$('f_category').value.trim(),quantity:num($('f_quantity').value),unit:$('f_unit').value.trim()||'pcs',location:$('f_location').value.trim(),reorderPoint:num($('f_reorderPoint').value),targetQty:num($('f_targetQty').value),vendor:$('f_vendor').value.trim(),vendorUrl:$('f_vendorUrl').value.trim(),partNumber:$('f_partNumber').value.trim(),manufacturer:$('f_manufacturer').value.trim(),unitCost:num($('f_unitCost').value),tags:$('f_tags').value.trim(),imageRef:$('f_imageRef').value.trim(),notes:$('f_notes').value.trim(),consumable:$('f_consumable').value==='true',reusable:$('f_reusable').value==='true',lastUpdated:now()}; const idx=state.inventory.findIndex(x=>x.id===id); idx>=0?state.inventory[idx]=out:state.inventory.push(out); ensureLocation(out.location); save(); toast('Item saved.'); render(); }
+  function resetItemForm(doRender=true){ const form=$('itemForm'); if(form){ form.reset(); $('f_id').value=''; $('f_unit').value='pcs'; $('formTitle').textContent='Add / Edit Item'; } if(doRender) render(); }
+  function editItem(id){ activeView='inventory'; render(); const i=item(id); if(!i) return; $('formTitle').textContent='Editing: '+i.name; $('f_id').value=i.id; Object.keys(i).forEach(k=>{const el=$('f_'+k); if(el) el.value=String(i[k]);}); window.scrollTo({top:0,behavior:'smooth'}); }
+  function duplicateItem(id){ const src=item(id); if(!src) return; state.inventory.push({...src,id:uid('itm'),name:src.name+' Copy',quantity:0,lastUpdated:now()}); save(); render(); }
+  function deleteItem(id){ if(!confirm('Delete this item?')) return; state.inventory=state.inventory.filter(i=>i.id!==id); state.kits.forEach(k=>k.bom.forEach(b=>{if(b.inventoryId===id)b.inventoryId=''; b.substituteIds=(b.substituteIds||'').split(',').filter(x=>x.trim()!==id).join(',');})); save(); render(); }
+  function adjust(id,delta,reason='corrected'){ const i=item(id); if(!i) return; i.quantity=Math.max(0,num(i.quantity)+num(delta)); i.lastUpdated=now(); state.adjustments.unshift({id:uid('adj'),itemId:id,itemName:i.name,delta:num(delta),reason,date:now(),note:''}); save(); render(); }
+  function inline(id,field,value){ const i=item(id); if(!i) return; i[field]=['quantity','reorderPoint','targetQty','unitCost'].includes(field)?num(value):value; i.lastUpdated=now(); if(field==='location') ensureLocation(value); save(); renderFilters(); }
 
-    function escapeHtml(value) {
-      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-    }
+  function renderKits(){ if(!selectedKitId || !kit(selectedKitId)) selectedKitId = state.kits[0]?.id || ''; const k=kit(selectedKitId); const qty=num($('kitQty')?.value || k?.defaultQty || 1); views.kits.innerHTML = `<section class="panel"><div class="panel-title"><h2>Build Kit Mode</h2><div class="row"><button onclick="App.newKit()">New Kit</button><button onclick="App.duplicateKit()">Duplicate Kit</button><button class="danger" onclick="App.deleteKit()">Delete Kit</button></div></div><div class="grid four"><label>Saved Kit<select id="kitSelect">${state.kits.map(x=>`<option value="${x.id}" ${x.id===selectedKitId?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label><label>Build Quantity<input id="kitQty" type="number" step="any" value="${esc(qty)}"></label><label>Kit Name<input id="kitName" value="${esc(k?.name||'')}"></label><label>Description<input id="kitDesc" value="${esc(k?.description||'')}"></label></div></section>${k?kitDetail(k,qty):'<section class="panel"><p>No build kits yet.</p></section>'}`; if(k){ $('kitSelect').onchange=e=>{selectedKitId=e.target.value;renderKits();}; $('kitQty').oninput=renderKits; $('kitName').onchange=e=>{k.name=e.target.value;save();renderTabs();}; $('kitDesc').onchange=e=>{k.description=e.target.value;save();}; } }
+  function kitDetail(k,qty){ const rows=kitRows(k,qty); const ready=maxKits(k); const short=rows.filter(r=>r.short>0); return `<section class="panel"><div class="panel-title"><h2>${esc(k.name)}</h2><div class="row"><span class="chip ${short.length?'warn-text':'ok'}">${short.length?'Short':'Ready'}</span><span class="chip">Maximum kits: ${fmt(ready)}</span><button class="primary" onclick="App.commitBuild()">Commit Build</button><button onclick="App.exportKitJson()">Export Kit JSON</button><button onclick="App.exportBomCsv()">Export BOM CSV</button></div></div><div class="meter"><span style="width:${Math.min(100, qty?ready/qty*100:100)}%"></span></div><p class="muted">Requested ${fmt(qty)} kits. ${short.length?`Short on ${short.map(r=>esc(r.label)).join(', ')}.`:'All rows are available.'}</p><div class="table-wrap"><table><thead><tr><th>BOM Item</th><th>Inventory Match</th><th>Per Kit</th><th>Total</th><th>Available</th><th>Short</th><th>Substitutes</th><th></th></tr></thead><tbody>${k.bom.map(b=>bomRow(k,b,qty)).join('')}</tbody></table></div><button class="small" onclick="App.addBomRow()">Add BOM Row</button><label style="margin-top:12px">Kit Notes<textarea onchange="App.updateKitNotes(this.value)">${esc(k.notes||'')}</textarea></label></section>`; }
+  function inventoryOptions(sel=''){ return `<option value="">Unmatched</option>`+state.inventory.map(i=>`<option value="${i.id}" ${i.id===sel?'selected':''}>${esc(i.name)} (${fmt(i.quantity)} ${esc(i.unit)})</option>`).join(''); }
+  function bomRow(k,b,qty){ const r=kitRow(b,qty); return `<tr><td><input class="table-input wide" value="${esc(b.label)}" onchange="App.updateBom('${b.id}','label',this.value)"></td><td><select onchange="App.updateBom('${b.id}','inventoryId',this.value)">${inventoryOptions(b.inventoryId)}</select></td><td><input class="table-input narrow" type="number" step="any" value="${esc(b.perKit)}" onchange="App.updateBom('${b.id}','perKit',this.value)"> ${esc(b.unit||r.unit)}</td><td>${fmt(r.required)}</td><td>${fmt(r.available)}</td><td><span class="${r.short>0?'danger-text':'ok'}">${fmt(r.short)}</span></td><td><input class="table-input wide" placeholder="item ids, comma separated" value="${esc(b.substituteIds||'')}" onchange="App.updateBom('${b.id}','substituteIds',this.value)"></td><td><button class="small danger" onclick="App.deleteBom('${b.id}')">Delete</button></td></tr>`; }
+  function kitRows(k,qty){ return (k?.bom||[]).map(b=>kitRow(b,qty)); }
+  function kitRow(b,qty){ const primary=item(b.inventoryId); const subs=(b.substituteIds||'').split(',').map(s=>item(s.trim())).filter(Boolean); const available=[primary,...subs].filter(Boolean).reduce((sum,i)=>sum+num(i.quantity),0); const required=num(b.perKit)*num(qty); return {bomId:b.id,label:b.label||primary?.name||'Unmatched',inventoryId:b.inventoryId,required,available,short:Math.max(0,required-available),unit:b.unit||primary?.unit||''}; }
+  function maxKits(k){ const vals=(k?.bom||[]).map(b=>{ const avail=kitRow(b,1).available; const per=num(b.perKit); return per>0?Math.floor(avail/per):Infinity; }).filter(Number.isFinite); return vals.length?Math.min(...vals):0; }
+  function newKit(){ const k={id:uid('kit'),name:'New Build Kit',description:'',defaultQty:1,notes:'',bom:[]}; state.kits.push(k); selectedKitId=k.id; save(); render(); }
+  function duplicateKit(){ const k=kit(selectedKitId); if(!k)return; const copy=JSON.parse(JSON.stringify(k)); copy.id=uid('kit'); copy.name += ' Copy'; copy.bom=copy.bom.map(b=>({...b,id:uid('bom')})); state.kits.push(copy); selectedKitId=copy.id; save(); render(); }
+  function deleteKit(){ if(!selectedKitId || !confirm('Delete this kit?'))return; state.kits=state.kits.filter(k=>k.id!==selectedKitId); selectedKitId=state.kits[0]?.id||''; save(); render(); }
+  function updateBom(id,field,value){ const k=kit(selectedKitId); const b=k?.bom.find(x=>x.id===id); if(!b)return; b[field]=field==='perKit'?num(value):value; save(); renderKits(); }
+  function addBomRow(){ const k=kit(selectedKitId); if(!k)return; k.bom.push({id:uid('bom'),label:'New BOM Item',inventoryId:state.inventory[0]?.id||'',perKit:1,unit:state.inventory[0]?.unit||'pcs',substituteIds:''}); save(); render(); }
+  function deleteBom(id){ const k=kit(selectedKitId); if(!k)return; k.bom=k.bom.filter(b=>b.id!==id); save(); render(); }
+  function updateKitNotes(v){ const k=kit(selectedKitId); if(k){k.notes=v;save();} }
+  function commitBuild(){ const k=kit(selectedKitId); if(!k)return; const qty=num($('kitQty')?.value||k.defaultQty||1); const rows=kitRows(k,qty); const short=rows.filter(r=>r.short>0); if(short.length && !confirm('This build is short. Commit available consumption anyway?')) return; const changes=[]; for(const b of k.bom){ let need=num(b.perKit)*qty; const candidates=[item(b.inventoryId),...(b.substituteIds||'').split(',').map(s=>item(s.trim()))].filter(Boolean); for(const inv of candidates){ if(need<=0) break; const take=Math.min(num(inv.quantity),need); if(take>0){ inv.quantity=num(inv.quantity)-take; inv.lastUpdated=now(); need-=take; changes.push({itemId:inv.id,itemName:inv.name,qty:take,unit:inv.unit}); } } } state.history.unshift({id:uid('hist'),type:'build',kitId:k.id,kitName:k.name,quantity:qty,date:now(),changes}); save(); toast('Build committed and inventory consumed.'); render(); }
 
-    function asNumber(value) {
-      const n = Number(value);
-      return Number.isFinite(n) ? n : 0;
-    }
+  function renderReorder(){ const rows=state.inventory.filter(i=>isLow(i)||i.reorderStatus==='needed'||i.reorderStatus==='ordered').sort((a,b)=>(a.vendor||'').localeCompare(b.vendor||'')||a.name.localeCompare(b.name)); views.reorder.innerHTML=`<section class="panel"><div class="panel-title"><h2>Reorder Workflow</h2><div class="row"><button onclick="App.exportCsv('reorder')">Export Reorder CSV</button><button onclick="App.copyReorder()">Copy Buy List</button></div></div><div class="table-wrap"><table><thead><tr><th>Item</th><th>On Hand</th><th>Target</th><th>Buy</th><th>Vendor</th><th>Estimate</th><th>Status</th></tr></thead><tbody>${rows.map(i=>{const buy=Math.max(0,num(i.targetQty)-num(i.quantity));return `<tr><td><b>${esc(i.name)}</b><br><span class="muted fine">${esc(i.partNumber)}</span></td><td>${fmt(i.quantity)} ${esc(i.unit)}</td><td><input class="table-input narrow" type="number" value="${esc(i.targetQty)}" onchange="App.inline('${i.id}','targetQty',this.value)"></td><td><b>${fmt(buy)}</b></td><td>${esc(i.vendor||'')}</td><td>${money(buy*num(i.unitCost))}</td><td><select onchange="App.setReorderStatus('${i.id}',this.value)">${['not needed','needed','ordered','received'].map(s=>`<option ${i.reorderStatus===s?'selected':''}>${s}</option>`).join('')}</select><button class="small" onclick="App.receiveOrder('${i.id}')">Receive</button></td></tr>`}).join('')}</tbody></table></div></section>`; }
+  function setReorderStatus(id,v){ const i=item(id); if(i){i.reorderStatus=v; i.lastUpdated=now(); save(); render();} }
+  function receiveOrder(id){ const i=item(id); if(!i)return; const qty=prompt('Quantity received?', Math.max(0,num(i.targetQty)-num(i.quantity))); if(qty===null)return; i.quantity+=num(qty); i.reorderStatus='received'; i.lastUpdated=now(); state.adjustments.unshift({id:uid('adj'),itemId:id,itemName:i.name,delta:num(qty),reason:'received',date:now(),note:'Received order'}); save(); render(); }
+  function copyReorder(){ const lines=state.inventory.filter(isLow).map(i=>`${i.name}: buy ${Math.max(0,num(i.targetQty)-num(i.quantity))} ${i.unit} from ${i.vendor||'vendor TBD'}`); navigator.clipboard?.writeText(lines.join('\n')); toast('Reorder list copied.'); }
 
-    function fmt(n) {
-      const value = asNumber(n);
-      return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
-    }
+  function renderLocations(){ views.locations.innerHTML=`<div class="grid two"><section class="panel"><div class="panel-title"><h2>Location Manager</h2><button onclick="App.addLocation()">Add Location</button></div><div class="table-wrap"><table><thead><tr><th>Location</th><th>Zone</th><th>Items</th><th>Last Audited</th><th></th></tr></thead><tbody>${state.locations.map(l=>`<tr><td><input class="table-input wide" value="${esc(l.name)}" onchange="App.updateLocation('${l.id}','name',this.value)"></td><td><input class="table-input" value="${esc(l.zone)}" onchange="App.updateLocation('${l.id}','zone',this.value)"></td><td>${state.inventory.filter(i=>i.location===l.name).length}</td><td><input type="date" value="${esc(l.lastAudited||'')}" onchange="App.updateLocation('${l.id}','lastAudited',this.value)"></td><td><button class="small" onclick="App.auditLocation('${l.id}')">Audit</button></td></tr>`).join('')}</tbody></table></div></section><section class="panel"><h2>Unknown Location</h2>${state.inventory.filter(i=>!i.location).map(i=>`<p><b>${esc(i.name)}</b> <button class="small" onclick="App.editItem('${i.id}')">Set Location</button></p>`).join('')||'<p class="muted">All items have locations.</p>'}<h2>Items by Location</h2>${state.locations.map(l=>`<details><summary><b>${esc(l.name)}</b></summary>${state.inventory.filter(i=>i.location===l.name).map(i=>`<p>${esc(i.name)} — ${fmt(i.quantity)} ${esc(i.unit)}</p>`).join('')||'<p class="muted">No items.</p>'}</details>`).join('')}</section></div>`; }
+  function ensureLocation(name){ if(name && !state.locations.some(l=>l.name===name)) state.locations.push({id:uid('loc'),name,zone:name.split('/').map(x=>x.trim())[1]||'',notes:'',lastAudited:''}); }
+  function addLocation(){ const name=prompt('Location name?','Garage / New Shelf / Bin'); if(!name)return; ensureLocation(name); save(); render(); }
+  function updateLocation(id,field,value){ const l=state.locations.find(x=>x.id===id); if(!l)return; const old=l.name; l[field]=value; if(field==='name') state.inventory.filter(i=>i.location===old).forEach(i=>i.location=value); save(); render(); }
+  function auditLocation(id){ const l=state.locations.find(x=>x.id===id); if(!l)return; activeView='count'; setTimeout(()=>{ window.App.startCount(l.name); },0); render(); }
 
-    function stockStatus(item) {
-      const qty = asNumber(item.quantity);
-      const reorder = asNumber(item.reorderPoint);
-      if (qty <= 0) return { label:'Empty', cls:'danger' };
-      if (qty < reorder) return { label:'Low', cls:'warn' };
-      return { label:'Bench Ready', cls:'ok' };
-    }
+  function renderCount(){ const active=state.countSessions[0]; views.count.innerHTML=`<section class="panel"><div class="panel-title"><h2>Count Sheet / Audit Mode</h2><div class="row"><select id="countLocation"><option value="">All locations</option>${unique(state.inventory.map(i=>i.location)).map(l=>`<option>${esc(l)}</option>`).join('')}</select><button class="primary" onclick="App.startCount(document.getElementById('countLocation').value)">Start Count</button><button onclick="window.print()">Print Count Sheet</button></div></div>${active?countSession(active):'<p class="muted">Start a count session for all items or a selected location.</p>'}</section>`; }
+  function startCount(location=''){ const items=state.inventory.filter(i=>!location||i.location===location).map(i=>({itemId:i.id,itemName:i.name,expected:num(i.quantity),actual:'',difference:0,notes:''})); state.countSessions.unshift({id:uid('count'),date:now(),location,items,status:'open'}); save(); render(); }
+  function countSession(s){ return `<h3>${s.location?esc(s.location):'All Locations'} · ${esc(s.date.slice(0,10))}</h3><div class="table-wrap"><table><thead><tr><th>Item</th><th>Expected</th><th>Actual</th><th>Difference</th><th>Notes</th></tr></thead><tbody>${s.items.map((r,idx)=>`<tr><td>${esc(r.itemName)}</td><td>${fmt(r.expected)}</td><td><input class="table-input narrow" type="number" step="any" value="${esc(r.actual)}" onchange="App.updateCount(${idx},'actual',this.value)"></td><td>${r.actual===''?'':fmt(num(r.actual)-num(r.expected))}</td><td><input class="table-input wide" value="${esc(r.notes)}" onchange="App.updateCount(${idx},'notes',this.value)"></td></tr>`).join('')}</tbody></table></div><div class="row" style="margin-top:12px"><button class="primary" onclick="App.applyCount()">Apply Count Corrections</button><button onclick="App.exportCsv('count')">Export Count CSV</button></div>`; }
+  function updateCount(idx,field,value){ const s=state.countSessions[0]; if(!s)return; s.items[idx][field]=value; save(); }
+  function applyCount(){ const s=state.countSessions[0]; if(!s)return; const changes=[]; s.items.forEach(r=>{ if(r.actual==='')return; const i=item(r.itemId); if(!i)return; const diff=num(r.actual)-num(i.quantity); i.quantity=num(r.actual); i.lastCounted=today(); i.lastUpdated=now(); changes.push({itemId:i.id,itemName:i.name,diff}); }); s.status='applied'; state.history.unshift({id:uid('hist'),type:'count',date:now(),location:s.location,changes}); save(); toast('Count corrections applied.'); render(); }
 
-    function thumbnail(item) {
-      const ref = String(item.imageRef || '').trim();
-      if (/^https?:\/\//i.test(ref) || /^data:image\//i.test(ref)) {
-        return `<span class="thumb"><img alt="" src="${escapeHtml(ref)}" onerror="this.remove();this.parentElement.textContent='${escapeHtml(item.name.slice(0,2).toUpperCase())}'"></span>`;
-      }
-      return `<span class="thumb">${escapeHtml((item.name || '?').slice(0,2).toUpperCase())}</span>`;
-    }
+  function renderCheckout(){ const tools=state.inventory.filter(i=>i.reusable); views.checkout.innerHTML=`<section class="panel"><div class="panel-title"><h2>Checkout / Loan Tracking</h2><span class="muted">Reusable tools and equipment</span></div><div class="table-wrap"><table><thead><tr><th>Tool</th><th>Available Qty</th><th>Status</th><th>Borrower</th><th>Due</th><th>Condition</th><th>Actions</th></tr></thead><tbody>${tools.map(i=>`<tr><td><b>${esc(i.name)}</b><br><span class="muted fine">${esc(i.location)}</span></td><td>${fmt(i.quantity)} ${esc(i.unit)}</td><td><span class="chip ${i.checkoutStatus==='checked out'?'blue':'ok'}">${esc(i.checkoutStatus||'available')}</span></td><td><input class="table-input" value="${esc(i.checkedOutTo||'')}" onchange="App.inline('${i.id}','checkedOutTo',this.value)"></td><td><input type="date" value="${esc(i.dueDate||'')}" onchange="App.inline('${i.id}','dueDate',this.value)"></td><td><input class="table-input" value="${esc(i.condition||'good')}" onchange="App.inline('${i.id}','condition',this.value)"></td><td><button class="small" onclick="App.checkout('${i.id}')">Check Out</button><button class="small" onclick="App.checkin('${i.id}')">Check In</button></td></tr>`).join('')}</tbody></table></div></section>`; }
+  function checkout(id){ const i=item(id); if(!i)return; const who=i.checkedOutTo||prompt('Checked out to?',''); if(!who)return; i.checkoutStatus='checked out'; i.checkedOutTo=who; if(!i.dueDate) i.dueDate=today(); state.checkouts.unshift({id:uid('co'),itemId:id,itemName:i.name,borrower:who,outDate:now(),dueDate:i.dueDate,status:'out'}); save(); render(); }
+  function checkin(id){ const i=item(id); if(!i)return; i.checkoutStatus='available'; const co=state.checkouts.find(c=>c.itemId===id && c.status==='out'); if(co){co.status='returned'; co.returnDate=now();} i.checkedOutTo=''; i.dueDate=''; save(); render(); }
 
-    function filteredInventory() {
-      const needle = filters.search.trim().toLowerCase();
-      return state.inventory.filter(item => {
-        const status = stockStatus(item);
-        const hay = [item.name, item.category, item.location, item.vendor, item.notes, item.unit].join(' ').toLowerCase();
-        return (!needle || hay.includes(needle)) && (!filters.category || item.category === filters.category) && (!filters.location || item.location === filters.location) && (!filters.lowOnly || status.cls !== 'ok');
-      });
-    }
+  function renderHistory(){ views.history.innerHTML=`<section class="panel"><div class="panel-title"><h2>Project / Change History</h2><div class="row"><button onclick="App.undoLastBuild()">Undo Latest Build</button><button onclick="App.exportCsv('history')">Export History CSV</button></div></div>${state.history.length?state.history.map(h=>`<article class="notice"><b>${esc(h.type)} ${esc(h.kitName||h.location||'')}</b> · ${esc(h.date.slice(0,19).replace('T',' '))}<br>${(h.changes||[]).map(c=>`${esc(c.itemName)} ${c.qty?'-'+fmt(c.qty):fmt(c.diff||0)} ${esc(c.unit||'')}`).join(', ')}</article>`).join(''):'<p class="muted">No history yet.</p>'}</section><section class="panel"><h2>Adjustments</h2>${state.adjustments.slice(0,50).map(a=>`<p>${esc(a.date.slice(0,10))}: <b>${esc(a.itemName)}</b> ${fmt(a.delta)} (${esc(a.reason)})</p>`).join('')||'<p class="muted">No adjustments yet.</p>'}</section>`; }
+  function undoLastBuild(){ const h=state.history.find(x=>x.type==='build'); if(!h){toast('No build to undo.');return;} if(!confirm('Undo latest build consumption?'))return; h.changes.forEach(c=>{const i=item(c.itemId); if(i){i.quantity+=num(c.qty); i.lastUpdated=now();}}); state.history=state.history.filter(x=>x.id!==h.id); save(); render(); }
 
-    function render() {
-      els.versionPill.textContent = 'v' + APP_VERSION;
-      els.footerText.textContent = `Parts Bin | M.B. Parks, Green Shoe Garage (c) 2026. All rights reserved. | Version ${APP_VERSION}`;
-      renderStats();
-      renderFilters();
-      renderInventory();
-      renderCards();
-      renderLowStock();
-      renderCountSheet();
-      renderProjects();
-      renderKit();
-    }
+  function renderLabels(){ const locs=unique(state.inventory.map(i=>i.location)); const rows=state.inventory.filter(i=>!selectedLabelLocation || i.location===selectedLabelLocation); views.labels.innerHTML=`<section class="panel no-print"><div class="panel-title"><h2>Labels and QR-Style IDs</h2><div class="row"><select onchange="App.setLabelLocation(this.value)"><option value="">All locations</option>${locs.map(l=>`<option ${l===selectedLabelLocation?'selected':''}>${esc(l)}</option>`).join('')}</select><button onclick="window.print()">Print Labels</button></div></div><p class="muted">Labels include item name, FI item ID, location, reorder point, and a deterministic QR-style visual block for quick recognition.</p></section><section class="label-grid">${rows.map(labelCard).join('')}</section>`; }
+  function labelCard(i){ return `<article class="label-card"><div class="qr">${qrBits(i.id).map(b=>`<i class="${b?'':'off'}"></i>`).join('')}</div><b>${esc(i.name)}</b><br><span class="mono">${esc(i.id)}</span><br><small>${esc(i.location)}</small><br><small>Reorder: ${fmt(i.reorderPoint)} ${esc(i.unit)} · Qty: ${fmt(i.quantity)}</small></article>`; }
+  function qrBits(str){ let h=0; for(let c of str) h=((h<<5)-h+c.charCodeAt(0))|0; return Array.from({length:49},(_,i)=>((h>>>(i%24)) ^ i ^ (i*7)) & 1); }
+  function setLabelLocation(v){ selectedLabelLocation=v; render(); }
 
-    function renderStats() {
-      const totalItems = state.inventory.length;
-      const low = state.inventory.filter(i => stockStatus(i).cls === 'warn').length;
-      const empty = state.inventory.filter(i => stockStatus(i).cls === 'danger').length;
-      const locations = new Set(state.inventory.map(i => i.location).filter(Boolean)).size;
-      els.stats.innerHTML = [
-        ['Item Types', totalItems], ['Low Stock', low], ['Empty', empty], ['Locations', locations]
-      ].map(([label, value]) => `<div class="stat"><b>${value}</b><span>${label}</span></div>`).join('');
-    }
+  function renderFiles(){ views.files.innerHTML=`<div class="grid two"><section class="panel"><h2>Export</h2><div class="grid two"><button onclick="App.exportJson()">Shop JSON Backup</button><button onclick="App.exportCsv('inventory')">Inventory CSV</button><button onclick="App.exportCsv('reorder')">Reorder CSV</button><button onclick="App.exportBomCsv()">Current BOM CSV</button><button onclick="App.exportKitJson()">Current Kit JSON</button><button onclick="App.exportCsv('history')">History CSV</button></div></section><section class="panel"><h2>Import</h2><p class="muted">Use preview/merge style imports for CSV and kit files. Shop JSON replaces the complete state after confirmation.</p><div class="grid"><label class="file-label">Import Inventory CSV<input type="file" accept=".csv,text/csv" onchange="App.importCsvFile(this.files[0],'inventory');this.value=''"></label><label class="file-label">Import BOM CSV into Current Kit<input type="file" accept=".csv,text/csv" onchange="App.importCsvFile(this.files[0],'bom');this.value=''"></label><label class="file-label">Import Single Kit JSON<input type="file" accept=".json,application/json" onchange="App.importKitFile(this.files[0]);this.value=''"></label></div></section><section class="panel"><h2>Data Safety</h2><ul><li>Schema version: ${SCHEMA_VERSION}</li><li>Last saved: ${esc((state.updatedAt||'').replace('T',' ').slice(0,19))}</li><li>Exported backups include inventory, locations, kits, count sessions, checkout records, history, and adjustments.</li></ul><button class="danger" onclick="App.clearData()">Clear Local Data</button></section></div>`; }
 
-    function renderFilters() {
-      const categories = [...new Set(state.inventory.map(i => i.category).filter(Boolean))].sort();
-      const locations = [...new Set(state.inventory.map(i => i.location).filter(Boolean))].sort();
-      updateSelect(els.categoryFilter, categories, 'All categories', filters.category);
-      updateSelect(els.locationFilter, locations, 'All locations', filters.location);
-    }
+  function csvEscape(v){ const s=String(v??''); return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+  function download(name, text, type='text/plain'){ const blob=new Blob([text],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
+  function exportJson(){ download(`fi-056-parts-bin-v${APP_VERSION}-${today()}.json`, JSON.stringify(state,null,2),'application/json'); }
+  function exportCsv(kind){ let rows=[]; if(kind==='inventory') rows=state.inventory; if(kind==='reorder') rows=state.inventory.filter(isLow).map(i=>({...i,buyQty:Math.max(0,num(i.targetQty)-num(i.quantity)),estimatedCost:Math.max(0,num(i.targetQty)-num(i.quantity))*num(i.unitCost)})); if(kind==='count') rows=(state.countSessions[0]?.items||[]); if(kind==='history') rows=state.history.map(h=>({id:h.id,type:h.type,name:h.kitName||h.location||'',date:h.date,changes:JSON.stringify(h.changes||[])})); if(!rows.length){toast('Nothing to export.');return;} const keys=unique(rows.flatMap(r=>Object.keys(r))); download(`fi-056-${kind}-${today()}.csv`, [keys.join(','),...rows.map(r=>keys.map(k=>csvEscape(r[k])).join(','))].join('\n'),'text/csv'); }
+  function exportBomCsv(){ const k=kit(selectedKitId)||state.kits[0]; if(!k){toast('No kit selected.');return;} const keys=['label','inventoryId','perKit','unit','substituteIds']; download(`fi-056-${slug(k.name)}-bom-${today()}.csv`, [keys.join(','),...k.bom.map(b=>keys.map(x=>csvEscape(b[x])).join(','))].join('\n'),'text/csv'); }
+  function exportKitJson(){ const k=kit(selectedKitId)||state.kits[0]; if(!k){toast('No kit selected.');return;} download(`fi-056-${slug(k.name)}-kit-${today()}.json`, JSON.stringify(k,null,2),'application/json'); }
+  function slug(s){ return String(s||'file').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'file'; }
+  function parseCsv(text){ const rows=[]; let row=[],cell='',q=false; for(let i=0;i<text.length;i++){ const ch=text[i], nx=text[i+1]; if(q && ch==='"' && nx==='"'){cell+='"'; i++;} else if(ch==='"'){q=!q;} else if(!q && ch===','){row.push(cell); cell='';} else if(!q && /\r|\n/.test(ch)){ if(ch==='\r'&&nx==='\n')i++; row.push(cell); if(row.some(x=>x!=='')) rows.push(row); row=[]; cell='';} else cell+=ch;} row.push(cell); if(row.some(x=>x!=='')) rows.push(row); const head=rows.shift()||[]; return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h.trim(),r[i]??'']))); }
+  function importJsonFile(file){ if(!file)return; const fr=new FileReader(); fr.onload=()=>{ try{ const imported=migrate(JSON.parse(fr.result)); if(confirm(`Replace current shop data with imported JSON containing ${imported.inventory.length} items and ${imported.kits.length} kits?`)){state=imported; save(); render(); toast('Shop JSON imported.');}}catch(e){alert('Invalid JSON file.');} }; fr.readAsText(file); }
+  function importCsvFile(file,kind){ if(!file)return; const fr=new FileReader(); fr.onload=()=>{ const rows=parseCsv(fr.result); if(kind==='inventory'){ rows.forEach(r=>{ const id=r.id||uid('itm'); const existing=item(id); const obj={...(existing||{}),id,name:r.name||r.Item||r.item||'Imported Item',category:r.category||'',quantity:num(r.quantity),unit:r.unit||'pcs',location:r.location||'',reorderPoint:num(r.reorderPoint),targetQty:num(r.targetQty),vendor:r.vendor||'',vendorUrl:r.vendorUrl||'',partNumber:r.partNumber||'',manufacturer:r.manufacturer||'',unitCost:num(r.unitCost),notes:r.notes||'',tags:r.tags||'',imageRef:r.imageRef||'',consumable:String(r.consumable).toLowerCase()!=='false',reusable:String(r.reusable).toLowerCase()==='true',lastUpdated:now(),reorderStatus:r.reorderStatus||'not needed'}; const idx=state.inventory.findIndex(i=>i.id===id); idx>=0?state.inventory[idx]=obj:state.inventory.push(obj); ensureLocation(obj.location); }); } else { const k=kit(selectedKitId)||state.kits[0]; if(!k){newKit();} (kit(selectedKitId)||state.kits[0]).bom.push(...rows.map(r=>({id:uid('bom'),label:r.label||r.name||'Imported BOM Item',inventoryId:r.inventoryId||'',perKit:num(r.perKit||r.quantity||1),unit:r.unit||'',substituteIds:r.substituteIds||''}))); } save(); render(); toast(`${rows.length} ${kind} rows imported.`); }; fr.readAsText(file); }
+  function importKitFile(file){ if(!file)return; const fr=new FileReader(); fr.onload=()=>{ try{ const k=JSON.parse(fr.result); k.id=uid('kit'); k.bom=(k.bom||[]).map(b=>({...b,id:uid('bom')})); state.kits.push({name:'Imported Kit',description:'',defaultQty:1,notes:'',...k}); selectedKitId=k.id; save(); render(); toast('Kit imported.'); }catch(e){alert('Invalid kit JSON.');} }; fr.readAsText(file); }
+  function clearData(){ if(confirm('Clear all local Parts Bin data?')){ localStorage.removeItem(STORE_KEY); state=sampleState(); save(); render(); } }
 
-    function updateSelect(select, values, firstLabel, selected) {
-      const prior = select.value || selected;
-      select.innerHTML = `<option value="">${firstLabel}</option>` + values.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
-      select.value = values.includes(prior) ? prior : '';
-    }
+  function renderTests(){ views.tests.innerHTML=`<section class="panel"><div class="panel-title"><h2>Regression Test Harness</h2><button class="primary" onclick="App.runTests()">Run Tests</button></div><div id="testResults" class="mono muted">Tests cover version visibility, FI number, dark mode, inventory status, build kit math, JSON round trip, CSV parser, locations, checkout, labels, and history.</div></section>`; }
+  function runTests(){ const out=[]; const assert=(name,pass,detail='')=>out.push({name,pass,detail}); const prior=document.body.dataset.theme; applyTheme('dark'); assert('Dark mode applies',document.body.dataset.theme==='dark'); applyTheme(prior||'light'); assert('Version is visible',document.body.innerText.includes('Version '+APP_VERSION)||document.body.innerText.includes('v'+APP_VERSION)); assert('FI-056 is visible',document.body.innerText.includes('FI-056')); assert('Empty status',status({quantity:0,reorderPoint:2})[0]==='Empty'); assert('Low status',status({quantity:1,reorderPoint:2})[0]==='Low'); assert('Ready status',status({quantity:3,reorderPoint:2})[0]==='Bench Ready'); const invBak=state.inventory; state.inventory=[{id:'a',name:'A',quantity:10,unit:'pcs'},{id:'b',name:'B',quantity:3,unit:'pcs'}]; const tk={bom:[{id:'x',inventoryId:'a',perKit:2,label:'A'},{id:'y',inventoryId:'b',perKit:1,label:'B'}]}; assert('Max kits math',maxKits(tk)===3); assert('Shortage math',kitRows(tk,5).find(r=>r.inventoryId==='b').short===2); state.inventory=invBak; assert('JSON round trip',migrate(JSON.parse(JSON.stringify(state))).inventory.length===state.inventory.length); assert('CSV parser',parseCsv('a,b\n1,"two, too"')[0].b==='two, too'); assert('Locations array',Array.isArray(state.locations)); assert('Checkout array',Array.isArray(state.checkouts)); assert('History array',Array.isArray(state.history)); assert('QR bits length',qrBits('abc').length===49); $('testResults').innerHTML=`<b>${out.filter(x=>x.pass).length}/${out.length} tests passed.</b>`+out.map(x=>`<div class="test-line"><span class="chip ${x.pass?'ok':'danger-text'}">${x.pass?'PASS':'FAIL'}</span> ${esc(x.name)} ${esc(x.detail)}</div>`).join(''); }
 
-    function renderInventory() {
-      const rows = filteredInventory();
-      els.resultCount.textContent = `${rows.length} item${rows.length === 1 ? '' : 's'}`;
-      if (!rows.length) {
-        els.inventoryBody.innerHTML = `<tr><td colspan="8"><div class="empty-state">No items match the current filters.</div></td></tr>`;
-        return;
-      }
-      els.inventoryBody.innerHTML = rows.map(item => {
-        const st = stockStatus(item);
-        return `<tr>
-          <td><div class="item-name">${thumbnail(item)}<span>${escapeHtml(item.name)}</span></div></td>
-          <td>${escapeHtml(item.category)}</td>
-          <td class="right mono">${fmt(item.quantity)}</td>
-          <td>${escapeHtml(item.unit)}</td>
-          <td>${escapeHtml(item.location)}</td>
-          <td><span class="chip ${st.cls}">${st.label}</span></td>
-          <td>${escapeHtml(item.vendor || '')}</td>
-          <td class="right"><div class="row-actions">
-            <button class="icon" title="Consume one" onclick="adjustQty('${item.id}', -1)">−</button>
-            <button class="icon" title="Add one" onclick="adjustQty('${item.id}', 1)">+</button>
-            <button class="small" onclick="editItem('${item.id}')">Edit</button>
-            <button class="small danger" onclick="deleteItem('${item.id}')">Delete</button>
-          </div></td>
-        </tr>`;
-      }).join('');
-    }
+  function applyTheme(theme){ document.body.dataset.theme=theme; localStorage.setItem(THEME_KEY,theme); $('themeBtn').textContent = theme==='dark' ? 'Light Mode' : 'Dark Mode'; }
+  function preferredTheme(){ return localStorage.getItem(THEME_KEY) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light'); }
 
-    function renderCards() {
-      const rows = filteredInventory();
-      els.cards.innerHTML = rows.length ? rows.map(item => {
-        const st = stockStatus(item);
-        return `<article class="card">
-          <div class="card-head">${thumbnail(item)}<div><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.category)} · ${fmt(item.quantity)} ${escapeHtml(item.unit)}</p></div></div>
-          <span class="chip ${st.cls}">${st.label}</span>
-          <p><strong>Location:</strong> ${escapeHtml(item.location)}</p>
-          <p><strong>Vendor:</strong> ${escapeHtml(item.vendor || 'Not set')}</p>
-        </article>`;
-      }).join('') : `<div class="empty-state">No cards match the current filters.</div>`;
-    }
-
-    function renderLowStock() {
-      const low = state.inventory.filter(i => stockStatus(i).cls !== 'ok').sort((a,b) => (a.quantity - a.reorderPoint) - (b.quantity - b.reorderPoint));
-      els.lowstockBody.innerHTML = low.length ? low.map(item => `<tr>
-        <td><div class="item-name">${thumbnail(item)}<span>${escapeHtml(item.name)}</span></div></td>
-        <td>${escapeHtml(item.location)}</td>
-        <td class="right mono">${fmt(item.quantity)}</td>
-        <td class="right mono">${fmt(item.reorderPoint)}</td>
-        <td class="right mono">${fmt(Math.max(0, asNumber(item.reorderPoint) - asNumber(item.quantity)))}</td>
-        <td>${escapeHtml(item.vendor || '')}</td>
-        <td>${escapeHtml(item.notes || '')}</td>
-      </tr>`).join('') : `<tr><td colspan="7"><div class="empty-state">No low stock items. The bench is ready.</div></td></tr>`;
-    }
-
-    function renderCountSheet() {
-      els.countBody.innerHTML = state.inventory.map(item => `<tr>
-        <td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.category)}</td><td>${escapeHtml(item.location)}</td><td class="right mono">${fmt(item.quantity)} ${escapeHtml(item.unit)}</td><td></td><td></td><td></td>
-      </tr>`).join('');
-    }
-
-    function renderProjects() {
-      const selected = els.projectSelect.value || state.projects[0]?.id || '';
-      els.projectSelect.innerHTML = state.projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
-      if (state.projects.some(p => p.id === selected)) els.projectSelect.value = selected;
-    }
-
-    function currentProject() {
-      return state.projects.find(p => p.id === els.projectSelect.value) || state.projects[0];
-    }
-
-    function kitRows(project = currentProject(), qty = asNumber(els.buildQty.value || 1)) {
-      if (!project) return [];
-      return project.bom.map(row => {
-        const inv = state.inventory.find(i => i.id === row.inventoryId);
-        const needed = asNumber(row.perKit) * qty;
-        const available = inv ? asNumber(inv.quantity) : 0;
-        const short = Math.max(0, needed - available);
-        return { ...row, inv, needed, available, short, ok: short <= 0 };
-      });
-    }
-
-    function maxReadyKits(project = currentProject()) {
-      if (!project || !project.bom.length) return 0;
-      const capacities = project.bom.map(row => {
-        const inv = state.inventory.find(i => i.id === row.inventoryId);
-        if (!inv || asNumber(row.perKit) <= 0) return 0;
-        return Math.floor(asNumber(inv.quantity) / asNumber(row.perKit));
-      });
-      return Math.min(...capacities);
-    }
-
-    function renderKit() {
-      const project = currentProject();
-      if (!project) {
-        els.bomEditor.innerHTML = '<div class="empty-state">No projects yet.</div>';
-        return;
-      }
-      const buildQty = Math.max(1, Math.floor(asNumber(els.buildQty.value || 1)));
-      if (String(buildQty) !== els.buildQty.value) els.buildQty.value = buildQty;
-      const rows = kitRows(project, buildQty);
-      const ready = maxReadyKits(project);
-      const allOk = rows.every(r => r.ok);
-      const readiness = Math.min(100, Math.round((ready / buildQty) * 100));
-      els.readyKits.textContent = ready;
-      els.readinessBar.style.width = readiness + '%';
-      els.kitStatus.value = allOk ? 'Ready' : 'Short';
-      const shorts = rows.filter(r => !r.ok).map(r => `${r.label}: short ${fmt(r.short)} ${r.unit}`);
-      els.kitSummary.innerHTML = allOk ? `This project is <strong>bench ready</strong> for ${buildQty} kit${buildQty === 1 ? '' : 's'}.` : `Ready for <strong>${ready}</strong> complete kit${ready === 1 ? '' : 's'} at current stock. Short items: ${escapeHtml(shorts.join('; '))}.`;
-      els.kitBody.innerHTML = rows.map(r => `<tr>
-        <td>${escapeHtml(r.label)}</td>
-        <td>${escapeHtml(r.inv ? r.inv.name : 'Missing inventory match')}</td>
-        <td class="right mono">${fmt(r.needed)} ${escapeHtml(r.unit)}</td>
-        <td class="right mono">${fmt(r.available)} ${escapeHtml(r.inv ? r.inv.unit : r.unit)}</td>
-        <td class="right mono">${fmt(r.short)}</td>
-        <td><span class="chip ${r.ok ? 'ok' : 'danger'}">${r.ok ? 'Ready' : 'Short'}</span></td>
-      </tr>`).join('');
-      renderBomEditor(project);
-    }
-
-    function renderBomEditor(project) {
-      const options = state.inventory.map(i => `<option value="${i.id}">${escapeHtml(i.name)}</option>`).join('');
-      els.bomEditor.innerHTML = project.bom.map(row => `<div class="bom-row" data-bom-id="${row.id}">
-        <label>Inventory match<select data-bom-field="inventoryId">${options}</select></label>
-        <label>Per kit<input type="number" min="0" step="0.01" value="${escapeHtml(row.perKit)}" data-bom-field="perKit" /></label>
-        <label>Unit<input value="${escapeHtml(row.unit)}" data-bom-field="unit" /></label>
-        <button class="small danger" onclick="deleteBomRow('${row.id}')">Remove</button>
-        <label style="grid-column:1/-1">BOM label<input value="${escapeHtml(row.label)}" data-bom-field="label" /></label>
-      </div>`).join('');
-      project.bom.forEach(row => {
-        const select = els.bomEditor.querySelector(`[data-bom-id="${row.id}"] select[data-bom-field="inventoryId"]`);
-        if (select) select.value = row.inventoryId;
-      });
-      els.bomEditor.querySelectorAll('[data-bom-field]').forEach(input => {
-        input.addEventListener('change', event => {
-          const wrap = event.target.closest('[data-bom-id]');
-          const bomRow = project.bom.find(r => r.id === wrap.dataset.bomId);
-          if (!bomRow) return;
-          const field = event.target.dataset.bomField;
-          bomRow[field] = field === 'perKit' ? asNumber(event.target.value) : event.target.value;
-          if (field === 'inventoryId') {
-            const inv = state.inventory.find(i => i.id === event.target.value);
-            if (inv && (!bomRow.label || bomRow.label === 'New BOM Item')) {
-              bomRow.label = inv.name;
-              bomRow.unit = inv.unit;
-            }
-          }
-          saveState();
-          renderKit();
-        });
-      });
-    }
-
-    function resetForm() {
-      els.form.reset();
-      els.itemId.value = '';
-      els.itemQuantity.value = 0;
-      els.itemReorder.value = 0;
-      els.formTitle.textContent = 'Add Item';
-    }
-
-    window.editItem = function(id) {
-      const item = state.inventory.find(i => i.id === id);
-      if (!item) return;
-      els.itemId.value = item.id;
-      els.itemName.value = item.name || '';
-      els.itemCategory.value = item.category || '';
-      els.itemQuantity.value = item.quantity ?? 0;
-      els.itemUnit.value = item.unit || '';
-      els.itemReorder.value = item.reorderPoint ?? 0;
-      els.itemLocation.value = item.location || '';
-      els.itemVendor.value = item.vendor || '';
-      els.itemImage.value = item.imageRef || '';
-      els.itemNotes.value = item.notes || '';
-      els.formTitle.textContent = 'Edit Item';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    window.deleteItem = function(id) {
-      const item = state.inventory.find(i => i.id === id);
-      if (!item) return;
-      const used = state.projects.some(p => p.bom.some(b => b.inventoryId === id));
-      const warning = used ? '\n\nThis item is used in at least one build kit. BOM rows will become unmatched.' : '';
-      if (!confirm(`Delete ${item.name}?${warning}`)) return;
-      state.inventory = state.inventory.filter(i => i.id !== id);
-      saveState();
-      render();
-    }
-
-    window.adjustQty = function(id, delta) {
-      const item = state.inventory.find(i => i.id === id);
-      if (!item) return;
-      item.quantity = Math.max(0, asNumber(item.quantity) + delta);
-      saveState();
-      render();
-    }
-
-    window.deleteBomRow = function(bomId) {
-      const project = currentProject();
-      if (!project) return;
-      project.bom = project.bom.filter(r => r.id !== bomId);
-      saveState();
-      renderKit();
-    }
-
-    function setView(view) {
-      currentView = view;
-      document.querySelectorAll('.tab').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
-      ['inventory','cards','lowstock','kit','count','tests'].forEach(name => {
-        document.getElementById(name + 'View').classList.toggle('hidden', name !== view);
-      });
-      render();
-    }
-
-    function copyReorderList() {
-      const rows = state.inventory.filter(i => stockStatus(i).cls !== 'ok');
-      const text = rows.map(i => `${i.name} | On hand: ${fmt(i.quantity)} ${i.unit} | Reorder point: ${fmt(i.reorderPoint)} | Buy at least: ${fmt(Math.max(0, asNumber(i.reorderPoint) - asNumber(i.quantity)))} | Vendor: ${i.vendor || 'Not set'}`).join('\n');
-      navigator.clipboard?.writeText(text || 'No low stock items.').then(() => alert('Reorder list copied.')).catch(() => alert(text || 'No low stock items.'));
-    }
-
-    function exportJson() {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `parts-bin-v${APP_VERSION}-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importJson(file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const imported = JSON.parse(reader.result);
-          if (!Array.isArray(imported.inventory) || !Array.isArray(imported.projects)) throw new Error('Expected inventory and projects arrays.');
-          state = { ...defaultState(), ...imported, version: APP_VERSION };
-          saveState();
-          resetForm();
-          render();
-          alert('Parts Bin data imported.');
-        } catch (err) {
-          alert('Import failed: ' + err.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function commitBuild() {
-      const project = currentProject();
-      const buildQty = Math.max(1, Math.floor(asNumber(els.buildQty.value || 1)));
-      const rows = kitRows(project, buildQty);
-      const shortRows = rows.filter(r => !r.ok);
-      if (shortRows.length) {
-        alert('Cannot commit build. Some BOM rows are short.');
-        return;
-      }
-      if (!confirm(`Commit ${buildQty} ${project.name} kit${buildQty === 1 ? '' : 's'} and consume inventory?`)) return;
-      rows.forEach(r => {
-        if (r.inv) r.inv.quantity = Math.max(0, asNumber(r.inv.quantity) - r.needed);
-      });
-      saveState();
-      render();
-    }
-
-    function addProject() {
-      const name = prompt('Project name:', 'New Build Kit');
-      if (!name) return;
-      const first = state.inventory[0];
-      const project = { id: uid('prj'), name, bom: first ? [{ id: uid('bom'), inventoryId: first.id, label: first.name, perKit: 1, unit: first.unit }] : [] };
-      state.projects.push(project);
-      saveState();
-      renderProjects();
-      els.projectSelect.value = project.id;
-      setView('kit');
-    }
-
-    function addBomRow() {
-      const project = currentProject();
-      const first = state.inventory[0];
-      if (!project || !first) return;
-      project.bom.push({ id: uid('bom'), inventoryId: first.id, label:'New BOM Item', perKit:1, unit:first.unit });
-      saveState();
-      renderKit();
-    }
-
-    function runTests() {
-      const results = [];
-      const assert = (name, pass, detail='') => results.push({ name, pass, detail });
-      assert('Version number is visible', document.body.innerText.includes('Version ' + APP_VERSION), 'Expected footer or pill to include current version.');
-      assert('Stock status detects empty', stockStatus({quantity:0,reorderPoint:2}).label === 'Empty');
-      assert('Stock status detects low', stockStatus({quantity:1,reorderPoint:2}).label === 'Low');
-      assert('Stock status detects ready', stockStatus({quantity:2,reorderPoint:2}).label === 'Bench Ready');
-      const testInv = [{ id:'a', quantity:10, unit:'pcs' }, { id:'b', quantity:3, unit:'pcs' }];
-      const testProject = { id:'p', name:'Test', bom:[{ inventoryId:'a', perKit:2, label:'A', unit:'pcs' }, { inventoryId:'b', perKit:1, label:'B', unit:'pcs' }] };
-      const oldInv = state.inventory;
-      state.inventory = testInv;
-      assert('Max ready kits uses limiting BOM row', maxReadyKits(testProject) === 3, 'Expected 3 ready kits.');
-      const rows = kitRows(testProject, 5);
-      assert('Build shortage calculation works', rows.find(r => r.inventoryId === 'b').short === 2, 'Expected shortage of 2.');
-      state.inventory = oldInv;
-      assert('Storage shape has inventory array', Array.isArray(state.inventory));
-      assert('Storage shape has projects array', Array.isArray(state.projects));
-      const passed = results.filter(r => r.pass).length;
-      els.testResults.innerHTML = `<strong>${passed}/${results.length} tests passed.</strong><br><br>` + results.map(r => `<div><span class="chip ${r.pass ? 'ok' : 'danger'}">${r.pass ? 'PASS' : 'FAIL'}</span> ${escapeHtml(r.name)} ${r.detail ? `<span class="muted">${escapeHtml(r.detail)}</span>` : ''}</div>`).join('');
-    }
-
-    document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
-    els.searchInput.addEventListener('input', e => { filters.search = e.target.value; renderInventory(); renderCards(); });
-    els.categoryFilter.addEventListener('change', e => { filters.category = e.target.value; renderInventory(); renderCards(); });
-    els.locationFilter.addEventListener('change', e => { filters.location = e.target.value; renderInventory(); renderCards(); });
-    document.getElementById('showLowBtn').addEventListener('click', () => { filters.lowOnly = !filters.lowOnly; document.getElementById('showLowBtn').textContent = filters.lowOnly ? 'Showing low only' : 'Show low only'; renderInventory(); renderCards(); });
-    document.getElementById('clearFiltersBtn').addEventListener('click', () => { filters = { search:'', category:'', location:'', lowOnly:false }; els.searchInput.value = ''; document.getElementById('showLowBtn').textContent = 'Show low only'; render(); });
-    document.getElementById('newItemBtn').addEventListener('click', resetForm);
-    document.getElementById('resetFormBtn').addEventListener('click', resetForm);
-    document.getElementById('loadSampleBtn').addEventListener('click', () => { if (confirm('Replace current Parts Bin data with sample shop data?')) { state = defaultState(); saveState(); resetForm(); render(); } });
-    document.getElementById('exportBtn').addEventListener('click', exportJson);
-    document.getElementById('importFile').addEventListener('change', e => { if (e.target.files[0]) importJson(e.target.files[0]); e.target.value = ''; });
-    document.getElementById('printBtn').addEventListener('click', () => window.print());
-    document.getElementById('copyReorderBtn').addEventListener('click', copyReorderList);
-    document.getElementById('projectSelect').addEventListener('change', renderKit);
-    document.getElementById('buildQty').addEventListener('input', renderKit);
-    document.getElementById('addProjectBtn').addEventListener('click', addProject);
-    document.getElementById('addBomRowBtn').addEventListener('click', addBomRow);
-    document.getElementById('commitBuildBtn').addEventListener('click', commitBuild);
-    document.getElementById('runTestsBtn').addEventListener('click', runTests);
-
-    els.form.addEventListener('submit', event => {
-      event.preventDefault();
-      const item = {
-        id: els.itemId.value || uid('itm'),
-        name: els.itemName.value.trim(),
-        category: els.itemCategory.value.trim(),
-        quantity: asNumber(els.itemQuantity.value),
-        unit: els.itemUnit.value.trim(),
-        location: els.itemLocation.value.trim(),
-        reorderPoint: asNumber(els.itemReorder.value),
-        vendor: els.itemVendor.value.trim(),
-        imageRef: els.itemImage.value.trim(),
-        notes: els.itemNotes.value.trim()
-      };
-      const idx = state.inventory.findIndex(i => i.id === item.id);
-      if (idx >= 0) state.inventory[idx] = item;
-      else state.inventory.push(item);
-      saveState();
-      resetForm();
-      render();
-    });
-
-    resetForm();
-    render();
-  </script>
+  window.App = { setView(v){activeView=v;render();}, resetItemForm, editItem, duplicateItem, deleteItem, adjust, inline, updateBom, addBomRow, deleteBom, updateKitNotes, commitBuild, newKit, duplicateKit, deleteKit, exportKitJson, exportBomCsv, setReorderStatus, receiveOrder, copyReorder, addLocation, updateLocation, auditLocation, startCount, updateCount, applyCount, checkout, checkin, undoLastBuild, setLabelLocation, exportJson, exportCsv, importCsvFile, importKitFile, clearData, runTests };
+  $('themeBtn').onclick=()=>applyTheme(document.body.dataset.theme==='dark'?'light':'dark');
+  $('sampleBtn').onclick=()=>{ if(confirm('Replace current data with sample data?')){state=sampleState(); selectedKitId=state.kits[0].id; save(); render();} };
+  $('exportJsonBtn').onclick=exportJson; $('importJsonInput').onchange=e=>{importJsonFile(e.target.files[0]); e.target.value='';}; $('printBtn').onclick=()=>window.print();
+  els.search.oninput=e=>{filters.search=e.target.value;render();}; els.cat.onchange=e=>{filters.category=e.target.value;render();}; els.loc.onchange=e=>{filters.location=e.target.value;render();}; els.low.onclick=()=>{filters.lowOnly=!filters.lowOnly;render();}; $('clearFiltersBtn').onclick=()=>{filters={search:'',category:'',location:'',lowOnly:false}; els.search.value=''; render();};
+  applyTheme(preferredTheme()); selectedKitId=state.kits[0]?.id||''; save(); render();
+})();
+</script>
 </body>
 </html>
